@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Controle de Qualidade de DM de Concreto</title>
+  <meta name="description" content="Dashboard para controle de qualidade de dormentes de concreto com importação de planilha, produção, séries de liberação e refugos/reprovas." />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <main class="page">
+    <header class="hero" aria-label="Cabeçalho do painel">
+      <div class="hero__main">
+        <div class="brand" aria-label="Rumo">
+          <div class="brand__word">rum<span>o</span></div>
+          <div class="brand__line"></div>
+        </div>
+        <div>
+          <p class="eyebrow">Dormentes de concreto</p>
+          <h1>Controle de Qualidade de DM de Concreto</h1>
+          <p class="hero__text">Importe uma planilha no modelo combinado para visualizar produção, séries de liberação, refugos e reprovas.</p>
+        </div>
+      </div>
+
+      <aside class="hero__status" aria-label="Resumo da base atual">
+        <div class="source-pill" id="sourcePill"><span></span>Nenhuma planilha importada</div>
+        <div class="mini-stats">
+          <div class="mini-stat"><span>Produção</span><strong id="topProduction">0</strong></div>
+          <div class="mini-stat"><span>Lotes</span><strong id="topLots">0</strong></div>
+          <div class="mini-stat mini-stat--yellow"><span>Taxa refugo</span><strong id="topRejectRate">0%</strong></div>
+        </div>
+      </aside>
+    </header>
+
+    <nav class="tabs" aria-label="Navegação do painel">
+      <button class="tab-button active" type="button" data-tab="importTab">Importar planilha</button>
+      <button class="tab-button" type="button" data-tab="generalTab">Dashboard geral</button>
+      <button class="tab-button" type="button" data-tab="productionTab">Produção e séries</button>
+      <button class="tab-button" type="button" data-tab="rejectionsTab">Refugos / Reprovas</button>
+    </nav>
+
+    <section id="importTab" class="tab-panel active" aria-label="Importação de planilha">
+      <div class="import-grid">
+        <article class="import-card import-card--main">
+          <div class="card-icon">↥</div>
+          <h2>Importar planilha de controle</h2>
+          <p>O painel inicia zerado. Escolha a planilha de dormentes de concreto para carregar os dados de produção e refugos/reprovas no navegador.</p>
+          <div class="drop-zone" id="dropZone">
+            <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" hidden />
+            <button class="btn btn--primary" id="chooseFileBtn" type="button">Selecionar planilha</button>
+            <span>ou arraste o arquivo aqui</span>
+          </div>
+          <p class="import-status" id="importStatus">Aguardando importação.</p>
+        </article>
+
+        <article class="import-card">
+          <h3>Modelo esperado</h3>
+          <p>A planilha deve manter o mesmo padrão do arquivo enviado, com os blocos:</p>
+          <ul class="check-list">
+            <li><strong>Produção:</strong> Data de fabricação, lote, projeto, tipo de dormente, total da produção e série de ensaio.</li>
+            <li><strong>Refugos/Reprovas:</strong> semana, data de produção, período de inspeção, lote, projeto, tipo, molde, cavidade e motivo.</li>
+          </ul>
+        </article>
+
+        <article class="import-card">
+          <h3>Após importar</h3>
+          <p>Você verá KPIs, gráficos e tabelas úteis para acompanhar:</p>
+          <ul class="check-list">
+            <li>produção total e por projeto/bitola;</li>
+            <li>séries próximas do gatilho de ensaio;</li>
+            <li>taxa de refugo por período;</li>
+            <li>motivos, lotes, moldes e cavidades críticos.</li>
+          </ul>
+          <button class="btn btn--ghost" id="clearDataBtn" type="button">Limpar dados</button>
+        </article>
+      </div>
+    </section>
+
+    <section id="generalTab" class="tab-panel" aria-label="Dashboard geral">
+      <section class="filter-card" aria-label="Filtros do dashboard geral">
+        <div>
+          <h2>Dashboard geral</h2>
+          <p>Visão consolidada entre produção e ocorrências de qualidade.</p>
+        </div>
+        <div class="filter-grid filter-grid--general">
+          <label>Data inicial<input id="dashDateFrom" type="date" /></label>
+          <label>Data final<input id="dashDateTo" type="date" /></label>
+          <label>Projeto / bitola<select id="dashProjectFilter"><option value="todos">Todos</option></select></label>
+          <label>Busca<input id="dashSearch" placeholder="Lote, projeto, tipo ou motivo" /></label>
+        </div>
+      </section>
+
+      <section class="kpi-grid" id="generalKpis"></section>
+
+      <section class="dashboard-grid">
+        <article class="panel panel--wide">
+          <div class="panel-head"><div><h3>Produção e refugos por semana</h3><p>Semanas no eixo horizontal e quantidade no eixo vertical.</p></div></div>
+          <div id="weeklyQualityChart"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h3>Produção por projeto e bitola</h3><p>Total produzido por família de dormente.</p></div></div>
+          <div id="productionByProject"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h3>Motivos de reprova</h3><p>Principais causas registradas.</p></div></div>
+          <div id="rejectionByReason"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h3>Lotes críticos</h3><p>Lotes com maior volume ou taxa de refugo.</p></div></div>
+          <div id="criticalLots"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h3>Alertas de qualidade</h3><p>Leituras rápidas para direcionar ação.</p></div></div>
+          <div id="qualityInsights"></div>
+        </article>
+      </section>
+    </section>
+
+    <section id="productionTab" class="tab-panel" aria-label="Produção e séries">
+      <section class="filter-card" aria-label="Filtros de produção">
+        <div>
+          <h2>Produção e séries</h2>
+          <p>Controle de produção, lotes e gatilhos de ensaio de liberação.</p>
+        </div>
+        <div class="filter-grid">
+          <label>Data inicial<input id="prodDateFrom" type="date" /></label>
+          <label>Data final<input id="prodDateTo" type="date" /></label>
+          <label>Projeto / bitola<select id="prodProjectFilter"><option value="todos">Todos</option></select></label>
+          <label>Série<select id="prodSerieFilter"><option value="todos">Todas</option></select></label>
+          <label>Status<select id="prodStatusFilter"><option value="todos">Todos</option><option value="ensaio">Ensaio obrigatório</option><option value="proximo">Próximo do ensaio</option><option value="andamento">Em andamento</option><option value="planejado">Planejado / sem produção</option></select></label>
+          <label>Busca<input id="prodSearch" placeholder="Lote, projeto, série ou tipo" /></label>
+        </div>
+      </section>
+
+      <section class="kpi-grid" id="productionKpis"></section>
+
+      <section class="dashboard-grid">
+        <article class="panel panel--wide">
+          <div class="panel-head"><div><h3>Saldo produzido por projeto / bitola</h3><p>Nomes completos, sem abreviação.</p></div></div>
+          <div id="productionBalance"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h3>Produção por semana</h3><p>Quantidade fabricada por semana.</p></div></div>
+          <div id="productionWeeklyChart"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h3>Séries de liberação</h3><p>Progresso por regra de 2.000 peças ou 10 lotes.</p></div></div>
+          <div id="seriesCards"></div>
+        </article>
+        <article class="panel panel--wide">
+          <div class="panel-head"><div><h3>Itens de produção</h3><p>Lista dos lotes filtrados.</p></div></div>
+          <div id="productionTable"></div>
+        </article>
+      </section>
+    </section>
+
+    <section id="rejectionsTab" class="tab-panel" aria-label="Refugos e reprovas">
+      <section class="filter-card" aria-label="Filtros de refugos e reprovas">
+        <div>
+          <h2>Refugos / Reprovas</h2>
+          <p>Análise dos registros de não conformidade por motivo, lote, molde e cavidade.</p>
+        </div>
+        <div class="filter-grid">
+          <label>Data inicial<input id="rejDateFrom" type="date" /></label>
+          <label>Data final<input id="rejDateTo" type="date" /></label>
+          <label>Projeto / bitola<select id="rejProjectFilter"><option value="todos">Todos</option></select></label>
+          <label>Motivo<select id="rejReasonFilter"><option value="todos">Todos</option></select></label>
+          <label>Lote<input id="rejLotFilter" placeholder="Ex.: 2344" /></label>
+          <label>Busca<input id="rejSearch" placeholder="Motivo, molde, cavidade ou tipo" /></label>
+        </div>
+      </section>
+
+      <section class="kpi-grid" id="rejectionKpis"></section>
+
+      <section class="dashboard-grid">
+        <article class="panel panel--wide">
+          <div class="panel-head"><div><h3>Refugos por semana</h3><p>Semanas no eixo horizontal e quantidade no eixo vertical.</p></div></div>
+          <div id="rejectionWeeklyChart"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h3>Materiais com NC</h3><p>Nome completo do tipo de dormente.</p></div></div>
+          <div id="ncByMaterial"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h3>Motivos detalhados</h3><p>Ocorrências por causa registrada.</p></div></div>
+          <div id="detailedReasons"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h3>Moldes e cavidades críticos</h3><p>Concentração das ocorrências.</p></div></div>
+          <div id="moldCavityRanking"></div>
+        </article>
+        <article class="panel panel--wide">
+          <div class="panel-head"><div><h3>Tabela de refugos / reprovas</h3><p>Registros filtrados da planilha importada.</p></div></div>
+          <div id="rejectionTable"></div>
+        </article>
+      </section>
+    </section>
+
+    <footer class="footer">Controle de Qualidade de DM de Concreto</footer>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

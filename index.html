@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Página inicial para acessar os painéis de controle de qualidade." />
+  <title>Controle de qualidade</title>
+  <style>
+    :root {
+      --navy: #003B67;
+      --navy-2: #002E53;
+      --blue: #00A9E0;
+      --green: #00D66B;
+      --yellow: #FFDD00;
+      --white: #FFFFFF;
+      --line: rgba(255,255,255,.14);
+      --muted: rgba(255,255,255,.72);
+      --shadow: 0 24px 70px rgba(0, 15, 30, .40);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--white);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(0,169,224,.26), transparent 30%),
+        radial-gradient(circle at 84% 8%, rgba(0,214,107,.14), transparent 28%),
+        radial-gradient(circle at 50% 100%, rgba(255,221,0,.10), transparent 34%),
+        linear-gradient(160deg, var(--navy-2), var(--navy) 50%, #004F77);
+      display: grid;
+      place-items: center;
+      padding: 28px;
+    }
+
+    .home {
+      width: min(1060px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      padding: clamp(26px, 5vw, 56px);
+      background: linear-gradient(135deg, rgba(0,59,103,.94), rgba(0,46,83,.96));
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .home::after {
+      content: "";
+      position: absolute;
+      right: -110px;
+      top: -130px;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,169,224,.23), transparent 62%);
+      pointer-events: none;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 34px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      font-weight: 950;
+      letter-spacing: -.04em;
+      font-size: clamp(42px, 7vw, 66px);
+      line-height: .88;
+    }
+
+    .brand span { color: var(--blue); }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--yellow);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 850px;
+      font-size: clamp(38px, 7vw, 78px);
+      line-height: .98;
+      letter-spacing: -.055em;
+      font-weight: 950;
+    }
+
+    .subtitle {
+      margin: 18px 0 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: clamp(16px, 2vw, 20px);
+      line-height: 1.55;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .button-card {
+      min-height: 190px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 22px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      color: var(--white);
+      text-decoration: none;
+      background: rgba(255,255,255,.07);
+      box-shadow: 0 18px 42px rgba(0,0,0,.18);
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+
+    .button-card:hover,
+    .button-card:focus-visible {
+      transform: translateY(-4px);
+      border-color: rgba(255,221,0,.58);
+      background: rgba(255,255,255,.11);
+      outline: none;
+    }
+
+    .button-card strong {
+      display: block;
+      font-size: clamp(22px, 3vw, 30px);
+      line-height: 1.1;
+      letter-spacing: -.03em;
+    }
+
+    .button-card p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .button-card .go {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 12px 18px;
+      background: var(--yellow);
+      color: var(--navy-2);
+      font-weight: 950;
+    }
+
+    footer {
+      color: rgba(255,255,255,.55);
+      font-size: 14px;
+    }
+
+    @media (max-width: 760px) {
+      body { padding: 14px; }
+      .home { border-radius: 28px; }
+      .actions { grid-template-columns: 1fr; }
+      .button-card { min-height: 170px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="home" aria-label="Página inicial do controle de qualidade">
+    <div class="content">
+      <section>
+        <div class="brand" aria-label="Rumo">rum<span>o</span></div>
+        <p class="eyebrow">Painéis de inspeção</p>
+        <h1>Controle de qualidade</h1>
+        <p class="subtitle">Escolha qual painel deseja acessar. Os dois sistemas estão no mesmo projeto, mas continuam separados para manter as funcionalidades de cada um.</p>
+      </section>
+
+      <nav class="actions" aria-label="Escolha do painel">
+        <a class="button-card" href="./subcomponentes/">
+          <span>
+            <strong>Subcomponentes</strong>
+            <p>Acesse o controle visual de estoque, inspeções realizadas e cards por subcomponente.</p>
+          </span>
+          <span class="go">Abrir painel →</span>
+        </a>
+
+        <a class="button-card" href="./dm-concreto/">
+          <span>
+            <strong>DM de Concreto</strong>
+            <p>Acesse o controle de produção, séries de liberação, refugos e reprovas.</p>
+          </span>
+          <span class="go">Abrir painel →</span>
+        </a>
+      </nav>
+
+      <footer>Controle de qualidade • página inicial unificada</footer>
+    </div>
+  </main>
+</body>
+</html>
