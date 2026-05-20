@@ -258,11 +258,11 @@ async function parseWorkbookFile(file) {
 }
 
 function resetFilters() {
-  ["dashDateFrom", "dashDateTo", "dashSearch", "prodDateFrom", "prodDateTo", "prodSearch", "rejDateFrom", "rejDateTo", "rejLotFilter", "rejSearch"].forEach(id => {
+  ["dashDateFrom", "dashDateTo", "dashSearch", "prodDateFrom", "prodDateTo", "prodSearch", "relDateFrom", "relDateTo", "relSearch", "rejDateFrom", "rejDateTo", "rejLotFilter", "rejSearch"].forEach(id => {
     const el = $(id);
     if (el) el.value = "";
   });
-  ["dashProjectFilter", "prodProjectFilter", "prodSerieFilter", "prodStatusFilter", "rejProjectFilter", "rejReasonFilter"].forEach(id => {
+  ["dashProjectFilter", "prodProjectFilter", "prodSerieFilter", "prodStatusFilter", "relProjectFilter", "relStatusFilter", "rejProjectFilter", "rejReasonFilter"].forEach(id => {
     const el = $(id);
     if (el) el.value = "todos";
   });
@@ -282,6 +282,7 @@ function populateFilters() {
   setOptions("dashProjectFilter", groups);
   setOptions("prodProjectFilter", state.production.map(row => row.grupo));
   setOptions("prodSerieFilter", state.production.map(row => row.serie), "Todas");
+  setOptions("relProjectFilter", state.production.map(row => row.projeto));
   setOptions("rejProjectFilter", state.rejections.map(row => row.grupo));
   setOptions("rejReasonFilter", state.rejections.map(row => row.motivoComum));
 }
@@ -318,6 +319,16 @@ function getProductionFilters() {
   };
 }
 
+function getReleaseFilters() {
+  return {
+    from: $("relDateFrom")?.value || "",
+    to: $("relDateTo")?.value || "",
+    project: $("relProjectFilter")?.value || "todos",
+    status: $("relStatusFilter")?.value || "todos",
+    search: normalizeKey($("relSearch")?.value || "")
+  };
+}
+
 function getRejectionFilters() {
   return {
     from: $("rejDateFrom")?.value || "",
@@ -334,6 +345,18 @@ function filterProduction(rows, filters) {
     if (!compareDateInRange(row.data, filters.from, filters.to)) return false;
     if (filters.project && filters.project !== "todos" && row.grupo !== filters.project) return false;
     if (filters.serie && filters.serie !== "todos" && row.serie !== filters.serie) return false;
+    if (filters.search) {
+      const haystack = normalizeKey(`${row.data} ${row.lote} ${row.projeto} ${row.tipo} ${row.serie} ${row.grupo}`);
+      if (!haystack.includes(filters.search)) return false;
+    }
+    return true;
+  });
+}
+
+function filterReleaseProduction(rows, filters) {
+  return rows.filter(row => {
+    if (!compareDateInRange(row.data, filters.from, filters.to)) return false;
+    if (filters.project && filters.project !== "todos" && row.projeto !== filters.project) return false;
     if (filters.search) {
       const haystack = normalizeKey(`${row.data} ${row.lote} ${row.projeto} ${row.tipo} ${row.serie} ${row.grupo}`);
       if (!haystack.includes(filters.search)) return false;
@@ -537,6 +560,133 @@ function computeSeries(rows) {
   });
 }
 
+
+function releaseCycleKey(row) {
+  return `${row.projeto || "Sem projeto"}|||${row.serie || normalizeSerieName("", row.projeto)}`;
+}
+
+function isOpenReleaseSerie(serie) {
+  const key = normalizeKey(serie);
+  return !key || key.includes("SERIE ABERTA") || key === "0" || key === "SEM SERIE";
+}
+
+function releaseSerieNumber(serie) {
+  const match = clean(serie).match(/s[ée]rie\s*(\d+)/i);
+  return match ? Number(match[1]) : Number.POSITIVE_INFINITY;
+}
+
+function minDate(rows) {
+  const dates = rows.map(row => row.data).filter(isValidDate).sort();
+  return dates[0] || "";
+}
+
+function maxDate(rows) {
+  const dates = rows.map(row => row.data).filter(isValidDate).sort();
+  return dates.at(-1) || "";
+}
+
+function releaseTriggerLabel(quantidade, lotCount) {
+  const hitQty = quantidade >= LIMIT_QTY;
+  const hitLots = lotCount >= LIMIT_LOTS;
+  if (hitQty && hitLots) return "2.000 dormentes e 10 lotes";
+  if (hitQty) return "2.000 dormentes";
+  if (hitLots) return "10 lotes";
+  return "Aguardando gatilho";
+}
+
+function computeReleaseCycles(rows) {
+  const ordered = [...rows].sort((a, b) => {
+    return String(a.projeto).localeCompare(String(b.projeto), "pt-BR", { numeric: true })
+      || releaseSerieNumber(a.serie) - releaseSerieNumber(b.serie)
+      || String(a.data).localeCompare(String(b.data))
+      || Number(a.lote) - Number(b.lote)
+      || Number(a.linhaPlanilha) - Number(b.linhaPlanilha);
+  });
+  const map = new Map();
+  ordered.forEach(row => {
+    const key = releaseCycleKey(row);
+    const item = map.get(key) || {
+      key,
+      projeto: row.projeto || "Sem projeto",
+      serie: row.serie || normalizeSerieName("", row.projeto),
+      quantidade: 0,
+      lots: new Set(),
+      tipos: new Set(),
+      bitolas: new Set(),
+      rows: []
+    };
+    item.quantidade += row.quantidade || 0;
+    if (row.lote) item.lots.add(row.lote);
+    if (row.tipo) item.tipos.add(row.tipo);
+    if (row.bitola?.code) item.bitolas.add(row.bitola.code);
+    item.rows.push(row);
+    map.set(key, item);
+  });
+
+  return Array.from(map.values()).map(item => {
+    const lotCount = item.lots.size;
+    const quantidade = item.quantidade || 0;
+    const qtyPct = Math.min(100, quantidade / LIMIT_QTY * 100);
+    const lotPct = Math.min(100, lotCount / LIMIT_LOTS * 100);
+    const progress = Math.max(qtyPct, lotPct);
+    let status = "andamento";
+    let label = "Em contagem";
+    if (quantidade >= LIMIT_QTY || lotCount >= LIMIT_LOTS) { status = "ensaio"; label = "Ensaio obrigatório"; }
+    else if (quantidade >= NEAR_QTY || lotCount >= NEAR_LOTS) { status = "proximo"; label = "Próximo do ensaio"; }
+
+    const lotRows = Array.from(item.rows.reduce((lotMap, row) => {
+      const lotKey = String(row.lote || "Sem lote");
+      const lot = lotMap.get(lotKey) || {
+        lote: row.lote || "Sem lote",
+        datas: new Set(),
+        tipos: new Set(),
+        quantidade: 0,
+        linhaPlanilha: row.linhaPlanilha
+      };
+      if (row.data) lot.datas.add(row.data);
+      if (row.tipo) lot.tipos.add(row.tipo);
+      lot.quantidade += row.quantidade || 0;
+      lotMap.set(lotKey, lot);
+      return lotMap;
+    }, new Map()).values()).map(lot => {
+      const datas = Array.from(lot.datas).sort();
+      return {
+        lote: lot.lote,
+        data: datas[0] || "",
+        tipos: Array.from(lot.tipos).join(" / ") || "-",
+        quantidade: lot.quantidade,
+        linhaPlanilha: lot.linhaPlanilha
+      };
+    }).sort((a, b) => Number(a.lote) - Number(b.lote) || String(a.data).localeCompare(String(b.data)));
+
+    return {
+      ...item,
+      lotCount,
+      quantidade,
+      qtyPct,
+      lotPct,
+      progress,
+      status,
+      label,
+      gatilho: releaseTriggerLabel(quantidade, lotCount),
+      saldoQuantidade: Math.max(0, LIMIT_QTY - quantidade),
+      saldoLotes: Math.max(0, LIMIT_LOTS - lotCount),
+      primeiraData: minDate(item.rows),
+      ultimaData: maxDate(item.rows),
+      bitolaResumo: Array.from(item.bitolas).sort().join(" / ") || "-",
+      tipoResumo: Array.from(item.tipos).slice(0, 3).join(" / ") || "-",
+      aberta: isOpenReleaseSerie(item.serie),
+      lotRows
+    };
+  }).sort((a, b) => {
+    const priority = { ensaio: 0, proximo: 1, andamento: 2 };
+    return priority[a.status] - priority[b.status]
+      || b.progress - a.progress
+      || String(a.projeto).localeCompare(String(b.projeto), "pt-BR", { numeric: true })
+      || releaseSerieNumber(a.serie) - releaseSerieNumber(b.serie);
+  });
+}
+
 function renderHeaderStats() {
   const production = state.production;
   const rejections = state.rejections;
@@ -693,6 +843,111 @@ function renderProductionTable(rows) {
   </table></div>`;
 }
 
+
+function renderReleaseTests() {
+  const filters = getReleaseFilters();
+  const allRows = filterReleaseProduction(state.production, filters);
+  const allCycles = computeReleaseCycles(allRows);
+  const cycles = filters.status && filters.status !== "todos" ? allCycles.filter(item => item.status === filters.status) : allCycles;
+  const visibleKeys = new Set(cycles.map(item => item.key));
+  const rows = allRows.filter(row => visibleKeys.has(releaseCycleKey(row)));
+  const totalProduction = sum(rows, "quantidade");
+  const lotCount = countUnique(rows, row => row.lote);
+  const mandatory = cycles.filter(item => item.status === "ensaio").length;
+  const near = cycles.filter(item => item.status === "proximo").length;
+
+  renderKpis("releaseKpis", [
+    kpi("Produção contada", nf.format(totalProduction), "dormentes nos ciclos filtrados"),
+    kpi("Lotes contados", nf.format(lotCount), "lotes únicos"),
+    kpi("Projetos", nf.format(countUnique(rows, row => row.projeto)), "projetos no recorte"),
+    kpi("Ensaios obrigatórios", nf.format(mandatory), "2.000 peças ou 10 lotes"),
+    kpi("Próximos", nf.format(near), "acima de 1.800 peças ou 9 lotes")
+  ]);
+
+  renderReleaseCycleCards(cycles.slice(0, 18));
+  renderReleasePriorityList(cycles);
+  renderReleaseRuleBox();
+  renderReleaseLotsTable(cycles);
+}
+
+function renderReleaseCycleCards(cycles) {
+  const target = $("releaseCycleCards");
+  if (!target) return;
+  if (!cycles.length) {
+    target.innerHTML = emptyState("Nenhum ciclo encontrado", "Importe uma planilha ou ajuste os filtros de ensaio de liberação.");
+    return;
+  }
+  target.innerHTML = `<div class="release-grid">${cycles.map(item => `
+    <article class="series-card release-card">
+      <div class="series-card__top">
+        <div>
+          <h4>${escapeHtml(item.projeto)} • ${escapeHtml(item.serie)}</h4>
+          <p>${escapeHtml(item.aberta ? "Ciclo aberto sem série registrada" : "Série de ensaio registrada na planilha")} • ${escapeHtml(item.bitolaResumo)}</p>
+        </div>
+        <span class="status-badge status-${escapeHtml(item.status)}">${escapeHtml(item.label)}</span>
+      </div>
+      <div class="release-meta-grid">
+        <div><span>Período</span><strong>${escapeHtml(formatDate(item.primeiraData))} — ${escapeHtml(formatDate(item.ultimaData))}</strong></div>
+        <div><span>Gatilho</span><strong>${escapeHtml(item.gatilho)}</strong></div>
+        <div><span>Faltam peças</span><strong>${nf.format(item.saldoQuantidade)}</strong></div>
+        <div><span>Faltam lotes</span><strong>${nf.format(item.saldoLotes)}</strong></div>
+      </div>
+      <div class="series-progress">
+        <div><div class="progress-label"><span>Dormentes por projeto</span><span>${nf.format(item.quantidade)} / ${nf.format(LIMIT_QTY)}</span></div><div class="progress-track"><span style="width:${item.qtyPct}%"></span></div></div>
+        <div><div class="progress-label"><span>Lotes por projeto</span><span>${nf.format(item.lotCount)} / ${nf.format(LIMIT_LOTS)}</span></div><div class="progress-track progress-track--yellow"><span style="width:${item.lotPct}%"></span></div></div>
+      </div>
+    </article>`).join("")}</div>`;
+}
+
+function renderReleasePriorityList(cycles) {
+  const items = cycles.map(item => ({
+    name: `${item.projeto} • ${item.serie}`,
+    value: Math.round(item.progress),
+    meta: `${nf.format(item.quantidade)} dormentes • ${nf.format(item.lotCount)} lotes • ${item.gatilho}`
+  }));
+  renderRankList("releasePriorityList", items, {
+    limit: 10,
+    valueLabel: value => `${nf.format(value)}%`,
+    meta: item => item.meta,
+    trackClass: "progress-track--yellow"
+  });
+}
+
+function renderReleaseRuleBox() {
+  const target = $("releaseRuleBox");
+  if (!target) return;
+  target.innerHTML = `<div class="rule-box">
+    <div class="rule-step"><strong>1</strong><span>A planilha importada fornece data, lote, projeto, tipo, quantidade e a coluna <b>SÉRIE - ENSAIO DE LIBERAÇÃO</b>.</span></div>
+    <div class="rule-step"><strong>2</strong><span>O painel agrupa por <b>projeto + série de ensaio</b>. Cada série é um ciclo independente, ou seja, a contagem reinicia quando uma nova série aparece na planilha.</span></div>
+    <div class="rule-step"><strong>3</strong><span>O status vira <b>Ensaio obrigatório</b> quando o ciclo soma ${nf.format(LIMIT_QTY)} dormentes ou ${nf.format(LIMIT_LOTS)} lotes.</span></div>
+    <div class="rule-step"><strong>4</strong><span>Quando a coluna de série vem vazia ou zerada, os lotes entram como <b>ciclo aberto</b> até a planilha registrar uma nova realização de ensaio.</span></div>
+  </div>`;
+}
+
+function renderReleaseLotsTable(cycles) {
+  const target = $("releaseLotsTable");
+  if (!target) return;
+  const rows = cycles.flatMap(cycle => cycle.lotRows.map(lot => ({ cycle, lot }))).slice(0, 260);
+  if (!rows.length) {
+    target.innerHTML = emptyState("Nenhum lote encontrado", "Importe uma planilha ou ajuste os filtros.");
+    return;
+  }
+  target.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Projeto</th><th>Série / ciclo</th><th>Status</th><th>Lote</th><th>Data</th><th>Tipo de dormente</th><th>Qtd. lote</th><th>Acumulado do ciclo</th><th>Lotes ciclo</th></tr></thead>
+    <tbody>${rows.map(({ cycle, lot }) => `<tr>
+      <td><strong>${escapeHtml(cycle.projeto)}</strong></td>
+      <td>${escapeHtml(cycle.serie)}</td>
+      <td><span class="status-badge status-${escapeHtml(cycle.status)}">${escapeHtml(cycle.label)}</span></td>
+      <td><span class="pill">${escapeHtml(lot.lote)}</span></td>
+      <td>${escapeHtml(formatDate(lot.data))}</td>
+      <td>${escapeHtml(lot.tipos)}</td>
+      <td><strong>${nf.format(lot.quantidade || 0)}</strong></td>
+      <td>${nf.format(cycle.quantidade)} / ${nf.format(LIMIT_QTY)}</td>
+      <td>${nf.format(cycle.lotCount)} / ${nf.format(LIMIT_LOTS)}</td>
+    </tr>`).join("")}</tbody>
+  </table></div>`;
+}
+
 function renderRejections() {
   const filters = getRejectionFilters();
   const rows = filterRejections(state.rejections, filters);
@@ -769,10 +1024,13 @@ function renderEmptyDashboards() {
   renderKpis("productionKpis", [
     kpi("Produção", "0"), kpi("Lotes", "0"), kpi("Projetos / bitolas", "0"), kpi("Séries", "0"), kpi("Ensaios obrigatórios", "0")
   ]);
+  renderKpis("releaseKpis", [
+    kpi("Produção contada", "0"), kpi("Lotes contados", "0"), kpi("Projetos", "0"), kpi("Ensaios obrigatórios", "0"), kpi("Próximos", "0")
+  ]);
   renderKpis("rejectionKpis", [
     kpi("Ocorrências", "0"), kpi("Taxa NC", "0%"), kpi("Lotes com NC", "0"), kpi("Motivos", "0"), kpi("Moldes", "0")
   ]);
-  ["weeklyQualityChart", "productionByProject", "rejectionByReason", "criticalLots", "qualityInsights", "productionBalance", "productionWeeklyChart", "seriesCards", "productionTable", "rejectionWeeklyChart", "ncByMaterial", "detailedReasons", "moldCavityRanking", "rejectionTable"].forEach(id => {
+  ["weeklyQualityChart", "productionByProject", "rejectionByReason", "criticalLots", "qualityInsights", "productionBalance", "productionWeeklyChart", "seriesCards", "productionTable", "releaseCycleCards", "releasePriorityList", "releaseRuleBox", "releaseLotsTable", "rejectionWeeklyChart", "ncByMaterial", "detailedReasons", "moldCavityRanking", "rejectionTable"].forEach(id => {
     const el = $(id);
     if (el) el.innerHTML = emptyState("Painel zerado", "Importe uma planilha para visualizar os dados.");
   });
@@ -786,6 +1044,7 @@ function render() {
   }
   renderGeneral();
   renderProduction();
+  renderReleaseTests();
   renderRejections();
 }
 
@@ -846,6 +1105,7 @@ function setupEvents() {
   [
     "dashDateFrom", "dashDateTo", "dashProjectFilter", "dashSearch",
     "prodDateFrom", "prodDateTo", "prodProjectFilter", "prodSerieFilter", "prodStatusFilter", "prodSearch",
+    "relDateFrom", "relDateTo", "relProjectFilter", "relStatusFilter", "relSearch",
     "rejDateFrom", "rejDateTo", "rejProjectFilter", "rejReasonFilter", "rejLotFilter", "rejSearch"
   ].forEach(id => {
     const el = $(id);

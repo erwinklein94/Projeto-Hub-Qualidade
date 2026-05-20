@@ -36,6 +36,7 @@
       <button class="tab-button active" type="button" data-tab="importTab">Importar planilha</button>
       <button class="tab-button" type="button" data-tab="generalTab">Dashboard geral</button>
       <button class="tab-button" type="button" data-tab="productionTab">Produção e séries</button>
+      <button class="tab-button" type="button" data-tab="releaseTestsTab">Ensaios de liberação</button>
       <button class="tab-button" type="button" data-tab="rejectionsTab">Refugos / Reprovas</button>
     </nav>
 
@@ -153,6 +154,44 @@
         </article>
       </section>
     </section>
+
+    <section id="releaseTestsTab" class="tab-panel" aria-label="Ensaios de liberação">
+      <section class="filter-card" aria-label="Filtros dos ensaios de liberação">
+        <div>
+          <h2>Ensaios de liberação</h2>
+          <p>Controle automático das séries de lotes por projeto: a contagem reinicia a cada série de ensaio registrada na planilha e dispara ao atingir 2.000 dormentes ou 10 lotes.</p>
+        </div>
+        <div class="filter-grid">
+          <label>Data inicial<input id="relDateFrom" type="date" /></label>
+          <label>Data final<input id="relDateTo" type="date" /></label>
+          <label>Projeto<select id="relProjectFilter"><option value="todos">Todos</option></select></label>
+          <label>Status<select id="relStatusFilter"><option value="todos">Todos</option><option value="ensaio">Ensaio obrigatório</option><option value="proximo">Próximo do ensaio</option><option value="andamento">Em contagem</option></select></label>
+          <label>Busca<input id="relSearch" placeholder="Projeto, lote, série ou tipo" /></label>
+        </div>
+      </section>
+
+      <section class="kpi-grid" id="releaseKpis"></section>
+
+      <section class="dashboard-grid">
+        <article class="panel panel--wide">
+          <div class="panel-head"><div><h3>Fila de ensaios por projeto</h3><p>Cada cartão representa uma contagem reiniciada após a série de ensaio registrada na planilha.</p></div></div>
+          <div id="releaseCycleCards"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h3>Projetos mais próximos do gatilho</h3><p>Maior avanço entre quantidade produzida e lotes acumulados.</p></div></div>
+          <div id="releasePriorityList"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h3>Regra de contagem</h3><p>Como o painel interpreta os dados importados.</p></div></div>
+          <div id="releaseRuleBox"></div>
+        </article>
+        <article class="panel panel--wide">
+          <div class="panel-head"><div><h3>Detalhe dos lotes por série</h3><p>Lotes usados na contagem de cada ciclo de ensaio.</p></div></div>
+          <div id="releaseLotsTable"></div>
+        </article>
+      </section>
+    </section>
+
 
     <section id="rejectionsTab" class="tab-panel" aria-label="Refugos e reprovas">
       <section class="filter-card" aria-label="Filtros de refugos e reprovas">
