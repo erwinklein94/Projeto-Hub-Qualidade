@@ -7,7 +7,11 @@ const state = {
   production: [],
   rejections: [],
   sourceName: "",
-  activeTab: "importTab"
+  activeTab: "importTab",
+  weeklyReport: {
+    selectedPeriod: "",
+    manualByPeriod: {}
+  }
 };
 
 const nf = new Intl.NumberFormat("pt-BR");
@@ -249,6 +253,7 @@ async function parseWorkbookFile(file) {
   state.production = production;
   state.rejections = rejections;
   state.sourceName = file.name;
+  state.weeklyReport = { selectedPeriod: "", manualByPeriod: {} };
   resetFilters();
   populateFilters();
   switchTab("generalTab");
@@ -291,6 +296,7 @@ function clearData() {
   state.production = [];
   state.rejections = [];
   state.sourceName = "";
+  state.weeklyReport = { selectedPeriod: "", manualByPeriod: {} };
   resetFilters();
   populateFilters();
   switchTab("importTab");
@@ -769,6 +775,325 @@ function renderInsights(production, rejections, series) {
   </div>`;
 }
 
+
+function escapePreserveHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function dateFromIsoLocal(iso) {
+  if (!isValidDate(iso)) return null;
+  const [year, month, day] = iso.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function isoFromDateLocal(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function addDaysIso(iso, days) {
+  const date = dateFromIsoLocal(iso);
+  if (!date) return "";
+  date.setDate(date.getDate() + days);
+  return isoFromDateLocal(date);
+}
+
+function thursdayWeekStart(iso) {
+  const date = dateFromIsoLocal(iso);
+  if (!date) return "";
+  const diff = (date.getDay() - 4 + 7) % 7;
+  date.setDate(date.getDate() - diff);
+  return isoFromDateLocal(date);
+}
+
+function shortDate(iso) {
+  if (!isValidDate(iso)) return "__/__";
+  const [, month, day] = iso.split("-");
+  return `${day}/${month}`;
+}
+
+function weekNumberFromThursdayPeriod(startIso) {
+  const endIso = addDaysIso(startIso, 6);
+  const info = isoWeekInfo(endIso);
+  const number = Number(String(info.sort || "").split("-")[1]);
+  return Number.isFinite(number) && number > 0 ? number : "-";
+}
+
+function periodLabel(startIso) {
+  const endIso = addDaysIso(startIso, 6);
+  return `Semana ${weekNumberFromThursdayPeriod(startIso)} — ${formatDate(startIso)} a ${formatDate(endIso)}`;
+}
+
+function makeWeeklyReportPeriods() {
+  const dates = [...state.production, ...state.rejections]
+    .map(row => row.data)
+    .filter(isValidDate);
+  const map = new Map();
+  dates.forEach(iso => {
+    const start = thursdayWeekStart(iso);
+    if (!start) return;
+    map.set(start, {
+      key: start,
+      start,
+      end: addDaysIso(start, 6),
+      nextStart: addDaysIso(start, 7),
+      nextEnd: addDaysIso(start, 13),
+      weekNumber: weekNumberFromThursdayPeriod(start)
+    });
+  });
+  return Array.from(map.values()).sort((a, b) => b.start.localeCompare(a.start));
+}
+
+function rowsInWeeklyPeriod(rows, startIso) {
+  const endIso = addDaysIso(startIso, 6);
+  return rows.filter(row => isValidDate(row.data) && row.data >= startIso && row.data <= endIso);
+}
+
+function weeklyReasonText(rejections) {
+  if (!rejections.length) return "Sem refugos registrados: 0";
+  const map = new Map();
+  rejections.forEach(row => {
+    const reason = clean(row.motivoDetalhado || row.motivoIndicador || row.motivoComum || "Sem motivo informado");
+    map.set(reason, (map.get(reason) || 0) + 1);
+  });
+  return Array.from(map.entries())
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "pt-BR", { numeric: true }))
+    .map(([reason, value]) => `${reason}: ${nf.format(value)}`)
+    .join("\n");
+}
+
+function countWeeklyReleaseTests(productionRows) {
+  return new Set(productionRows
+    .filter(row => row.serie && !isOpenReleaseSerie(row.serie))
+    .map(row => `${row.projeto}|${row.serie}`)
+  ).size;
+}
+
+function getWeeklyReportAutoData(startIso) {
+  const period = {
+    key: startIso,
+    start: startIso,
+    end: addDaysIso(startIso, 6),
+    nextStart: addDaysIso(startIso, 7),
+    nextEnd: addDaysIso(startIso, 13),
+    weekNumber: weekNumberFromThursdayPeriod(startIso)
+  };
+  const productionRows = rowsInWeeklyPeriod(state.production, startIso);
+  const rejectionRows = rowsInWeeklyPeriod(state.rejections, startIso);
+  const productionTotal = sum(productionRows, "quantidade");
+  const tests = countWeeklyReleaseTests(productionRows);
+  return {
+    period,
+    productionRows,
+    rejectionRows,
+    productionTotal,
+    tests,
+    rejections: rejectionRows.length,
+    reasonText: weeklyReasonText(rejectionRows),
+    defaultCavanDate: addDaysIso(period.end, 2)
+  };
+}
+
+function getWeeklyManual(startIso, auto) {
+  if (!state.weeklyReport.manualByPeriod[startIso]) {
+    state.weeklyReport.manualByPeriod[startIso] = {
+      cavanDate: auto.defaultCavanDate,
+      tests: String(auto.tests),
+      reasonText: auto.reasonText,
+      analysis: "",
+      lotNotes: "",
+      nextPlanned: ""
+    };
+  }
+  return state.weeklyReport.manualByPeriod[startIso];
+}
+
+function formatFreeNumber(value) {
+  const text = clean(value);
+  if (!text) return "";
+  const parsed = parseQty(text);
+  return Number.isFinite(parsed) && parsed !== 0 ? nf.format(parsed) : text;
+}
+
+function generateWeeklyReportText(auto, manual) {
+  const p = auto.period;
+  const reportDate = manual.cavanDate ? formatDate(manual.cavanDate) : "";
+  const tests = formatFreeNumber(manual.tests);
+  const nextPlanned = formatFreeNumber(manual.nextPlanned);
+  const lines = [];
+  lines.push(`*Produção Semana ${p.weekNumber}*`);
+  lines.push("");
+  lines.push(`*CAVAN${reportDate ? ` - ${reportDate}` : ""}*`);
+  lines.push("");
+  lines.push(`Produzidos na semana (${shortDate(p.start)}) a (${shortDate(p.end)}): ${nf.format(auto.productionTotal)}`);
+  lines.push(`Quantidade de ensaios realizados (${shortDate(p.start)}) a (${shortDate(p.end)}): ${tests || "0"}`);
+  lines.push(`Refugos: ${nf.format(auto.rejections)}`);
+  lines.push("");
+  lines.push("*Motivo dos refugos:*");
+  lines.push(manual.reasonText || "Sem refugos registrados: 0");
+  lines.push("");
+  lines.push(`Análise:${manual.analysis ? ` ${manual.analysis}` : ""}`);
+  if (manual.lotNotes) {
+    lines.push("");
+    lines.push(manual.lotNotes);
+  }
+  lines.push("");
+  lines.push(`*Previsto para próxima semana (${shortDate(p.nextStart)}) a (${shortDate(p.nextEnd)}):* ${nextPlanned ? `*${nextPlanned}*` : ""}`);
+  return lines.join("\n").replace(/\n{3,}/g, "\n\n");
+}
+
+function currentWeeklyReportContext() {
+  const periods = makeWeeklyReportPeriods();
+  if (!periods.length) return null;
+  if (!state.weeklyReport.selectedPeriod || !periods.some(period => period.key === state.weeklyReport.selectedPeriod)) {
+    state.weeklyReport.selectedPeriod = periods[0].key;
+  }
+  const auto = getWeeklyReportAutoData(state.weeklyReport.selectedPeriod);
+  const manual = getWeeklyManual(state.weeklyReport.selectedPeriod, auto);
+  return { periods, auto, manual };
+}
+
+function setWeeklyReportStatus(message) {
+  const status = $("weeklyReportStatus");
+  if (status) status.textContent = message || "";
+}
+
+function updateWeeklyManualFromDom() {
+  const context = currentWeeklyReportContext();
+  if (!context) return;
+  const manual = context.manual;
+  $$('[data-weekly-field]').forEach(input => {
+    manual[input.dataset.weeklyField] = input.value;
+  });
+  refreshWeeklyReportOutput();
+}
+
+function refreshWeeklyReportOutput() {
+  const context = currentWeeklyReportContext();
+  const output = $("weeklyReportOutput");
+  if (!context || !output) return;
+  output.value = generateWeeklyReportText(context.auto, context.manual);
+}
+
+function setupWeeklyReportEvents() {
+  const select = $("weeklyReportWeekSelect");
+  if (select) {
+    select.addEventListener("change", () => {
+      state.weeklyReport.selectedPeriod = select.value;
+      renderWeeklyProductionReport();
+    });
+  }
+  $$('[data-weekly-field]').forEach(input => {
+    input.addEventListener("input", updateWeeklyManualFromDom);
+  });
+  $("copyWeeklyReportBtn")?.addEventListener("click", copyWeeklyReportText);
+  $("exportWeeklyReportPdfBtn")?.addEventListener("click", exportWeeklyReportPdf);
+}
+
+async function copyWeeklyReportText() {
+  const output = $("weeklyReportOutput");
+  const text = output?.value || "";
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    setWeeklyReportStatus("Texto copiado. Agora é só colar no WhatsApp.");
+  } catch (error) {
+    output.focus();
+    output.select();
+    const ok = document.execCommand("copy");
+    setWeeklyReportStatus(ok ? "Texto copiado. Agora é só colar no WhatsApp." : "Selecione o texto e copie manualmente.");
+  }
+}
+
+function exportWeeklyReportPdf() {
+  const output = $("weeklyReportOutput");
+  const text = output?.value || "";
+  if (!text) return;
+  const win = window.open("", "_blank", "width=900,height=720");
+  if (!win) {
+    alert("Não consegui abrir a janela de impressão. Libere pop-ups para exportar o PDF.");
+    return;
+  }
+  win.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Produção semanal</title><style>
+    body{font-family:Arial,sans-serif;margin:32px;color:#111827;}
+    h1{font-size:22px;margin:0 0 18px;}
+    pre{white-space:pre-wrap;font-family:Arial,sans-serif;font-size:14px;line-height:1.5;border:1px solid #d1d5db;border-radius:14px;padding:20px;}
+    @media print{body{margin:18mm;} pre{border:0;padding:0;}}
+  </style></head><body><h1>Anotação semanal de produção</h1><pre>${escapePreserveHtml(text)}</pre><script>window.addEventListener('load',function(){setTimeout(function(){window.print();},250);});<\/script></body></html>`);
+  win.document.close();
+  setWeeklyReportStatus("Janela de impressão aberta. Escolha “Salvar como PDF”.");
+}
+
+function renderWeeklyProductionReport() {
+  const target = $("weeklyProductionReport");
+  if (!target) return;
+  const context = currentWeeklyReportContext();
+  if (!context) {
+    target.innerHTML = emptyState("Sem semanas para gerar relatório", "Importe uma planilha com datas de produção ou refugo para montar a anotação semanal.");
+    return;
+  }
+  const { periods, auto, manual } = context;
+  const p = auto.period;
+  const outputText = generateWeeklyReportText(auto, manual);
+  target.innerHTML = `<div class="weekly-report">
+    <div class="weekly-report__filters">
+      <label>Semana quinta a quarta
+        <select id="weeklyReportWeekSelect">${periods.map(period => `<option value="${escapeHtml(period.key)}" ${period.key === state.weeklyReport.selectedPeriod ? "selected" : ""}>${escapeHtml(periodLabel(period.start))}</option>`).join("")}</select>
+      </label>
+      <label>Data do relatório CAVAN
+        <input type="date" data-weekly-field="cavanDate" value="${escapeHtml(manual.cavanDate || "")}" />
+      </label>
+      <label>Ensaios realizados
+        <input type="number" min="0" step="1" data-weekly-field="tests" value="${escapeHtml(manual.tests ?? String(auto.tests))}" />
+      </label>
+      <label>Previsto próxima semana
+        <input data-weekly-field="nextPlanned" placeholder="Ex.: 6600" value="${escapeHtml(manual.nextPlanned || "")}" />
+      </label>
+    </div>
+
+    <div class="weekly-report__auto">
+      <div class="weekly-report__auto-card"><span>Período usado</span><strong>${escapeHtml(shortDate(p.start))} a ${escapeHtml(shortDate(p.end))}</strong></div>
+      <div class="weekly-report__auto-card"><span>Produção automática</span><strong>${nf.format(auto.productionTotal)}</strong></div>
+      <div class="weekly-report__auto-card"><span>Refugos automáticos</span><strong>${nf.format(auto.rejections)}</strong></div>
+    </div>
+
+    <div class="weekly-report__manual">
+      <label class="weekly-report__field--wide">Motivos dos refugos
+        <textarea data-weekly-field="reasonText" id="weeklyReportReasonText"></textarea>
+      </label>
+      <label class="weekly-report__field--wide">Análise
+        <textarea data-weekly-field="analysis" id="weeklyReportAnalysis" placeholder="Ex.: 23 Unid (08/05 Lote *2831*)"></textarea>
+      </label>
+      <label class="weekly-report__field--wide">Observações dos lotes
+        <textarea data-weekly-field="lotNotes" id="weeklyReportLotNotes" placeholder="Ex.: *2838* Travado\n\n*2839* Molde 008 Cav 1.2.3.4.5.6"></textarea>
+      </label>
+    </div>
+
+    <div class="weekly-report__preview">
+      <label>Texto pronto para WhatsApp ou PDF
+        <textarea id="weeklyReportOutput" readonly></textarea>
+      </label>
+      <div class="weekly-report__actions">
+        <button class="btn btn--primary" type="button" id="copyWeeklyReportBtn">Copiar para WhatsApp</button>
+        <button class="btn btn--ghost" type="button" id="exportWeeklyReportPdfBtn">Exportar PDF deste relatório</button>
+        <span class="weekly-report__status" id="weeklyReportStatus"></span>
+      </div>
+    </div>
+  </div>`;
+  $("weeklyReportReasonText").value = manual.reasonText || "";
+  $("weeklyReportAnalysis").value = manual.analysis || "";
+  $("weeklyReportLotNotes").value = manual.lotNotes || "";
+  $("weeklyReportOutput").value = outputText;
+  setupWeeklyReportEvents();
+}
+
 function renderProduction() {
   const filters = getProductionFilters();
   const rows = filterProduction(state.production, filters);
@@ -796,6 +1121,7 @@ function renderProduction() {
   }, new Map()).values()).sort((a, b) => a.sort.localeCompare(b.sort)).slice(-16);
   renderVerticalChart("productionWeeklyChart", weekly, [{ field: "production", label: "Produção" }]);
   renderProductionTable(rows.slice(0, 160));
+  renderWeeklyProductionReport();
 }
 
 function renderSeriesCards(series) {
@@ -1039,7 +1365,7 @@ function renderEmptyDashboards() {
   renderKpis("rejectionKpis", [
     kpi("Ocorrências", "0"), kpi("Taxa NC", "0%"), kpi("Lotes com NC", "0"), kpi("Motivos", "0"), kpi("Moldes", "0")
   ]);
-  ["weeklyQualityChart", "productionByProject", "rejectionByReason", "criticalLots", "qualityInsights", "productionBalance", "productionWeeklyChart", "productionTable", "releaseCycleCards", "releasePriorityList", "releaseRuleBox", "releaseLotsTable", "rejectionWeeklyChart", "ncByMaterial", "detailedReasons", "moldCavityRanking", "rejectionTable"].forEach(id => {
+  ["weeklyQualityChart", "productionByProject", "rejectionByReason", "criticalLots", "qualityInsights", "productionBalance", "productionWeeklyChart", "productionTable", "weeklyProductionReport", "releaseCycleCards", "releasePriorityList", "releaseRuleBox", "releaseLotsTable", "rejectionWeeklyChart", "ncByMaterial", "detailedReasons", "moldCavityRanking", "rejectionTable"].forEach(id => {
     const el = $(id);
     if (el) el.innerHTML = emptyState("Painel zerado", "Importe uma planilha para visualizar os dados.");
   });

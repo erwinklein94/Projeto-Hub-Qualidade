@@ -743,3 +743,94 @@ td strong { color: #fff; }
   .tab-panel { display: block !important; page-break-before: always; }
   .tab-panel:first-of-type { page-break-before: auto; }
 }
+
+.weekly-report-panel {
+  scroll-margin-top: 18px;
+}
+.weekly-report {
+  display: grid;
+  gap: 16px;
+}
+.weekly-report__filters,
+.weekly-report__manual {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.weekly-report__manual {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.weekly-report__field--wide {
+  grid-column: 1 / -1;
+}
+.weekly-report textarea {
+  width: 100%;
+  min-height: 116px;
+  resize: vertical;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 13px;
+  padding: 11px;
+  outline: none;
+  color: #fff;
+  background: rgba(255,255,255,.08);
+  line-height: 1.45;
+}
+.weekly-report textarea:focus {
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 3px rgba(255,221,0,.12);
+}
+.weekly-report__auto {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.weekly-report__auto-card {
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 18px;
+  padding: 14px;
+  background: rgba(255,255,255,.045);
+}
+.weekly-report__auto-card span {
+  display: block;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-size: .68rem;
+  font-weight: 950;
+}
+.weekly-report__auto-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 1.5rem;
+  letter-spacing: -.04em;
+}
+.weekly-report__preview {
+  display: grid;
+  gap: 10px;
+}
+.weekly-report__preview textarea {
+  min-height: 360px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  white-space: pre-wrap;
+}
+.weekly-report__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.weekly-report__status {
+  color: rgba(255,255,255,.70);
+  font-size: .88rem;
+  font-weight: 800;
+}
+@media (max-width: 1180px) {
+  .weekly-report__filters,
+  .weekly-report__manual,
+  .weekly-report__auto { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .weekly-report__filters,
+  .weekly-report__manual,
+  .weekly-report__auto { grid-template-columns: 1fr; }
+}
