@@ -869,6 +869,34 @@ function weeklyReasonText(rejections) {
     .join("\n");
 }
 
+
+function sortLotValues(values) {
+  return Array.from(new Set(values.filter(value => clean(value))))
+    .sort((a, b) => String(a).localeCompare(String(b), "pt-BR", { numeric: true }));
+}
+
+function weeklyProducedLotsText(productionRows) {
+  if (!productionRows.length) return "Sem lotes produzidos no período selecionado.";
+  const map = new Map();
+  productionRows.forEach(row => {
+    const project = clean(row.grupo || row.projeto || row.tipo || "Projeto não informado");
+    const item = map.get(project) || { project, lots: [] };
+    if (row.lote) item.lots.push(String(row.lote));
+    map.set(project, item);
+  });
+  const groups = Array.from(map.values())
+    .map(item => ({ ...item, lots: sortLotValues(item.lots) }))
+    .filter(item => item.lots.length)
+    .sort((a, b) => a.project.localeCompare(b.project, "pt-BR", { numeric: true }));
+  if (!groups.length) return "Sem lotes informados no período selecionado.";
+  return groups.map(item => `${item.project}: ${item.lots.map(lot => `*${lot}*`).join(", ")}`).join("\n");
+}
+
+function weeklyProducedLotsPlainHtml(productionRows) {
+  const text = weeklyProducedLotsText(productionRows);
+  return escapeHtml(text);
+}
+
 function countWeeklyReleaseTests(productionRows) {
   return new Set(productionRows
     .filter(row => row.serie && !isOpenReleaseSerie(row.serie))
@@ -897,6 +925,7 @@ function getWeeklyReportAutoData(startIso) {
     tests,
     rejections: rejectionRows.length,
     reasonText: weeklyReasonText(rejectionRows),
+    lotsText: weeklyProducedLotsText(productionRows),
     defaultCavanDate: addDaysIso(period.end, 2)
   };
 }
@@ -933,6 +962,10 @@ function generateWeeklyReportText(auto, manual) {
   lines.push(`*CAVAN${reportDate ? ` - ${reportDate}` : ""}*`);
   lines.push("");
   lines.push(`Produzidos na semana (${shortDate(p.start)}) a (${shortDate(p.end)}): ${nf.format(auto.productionTotal)}`);
+  lines.push("");
+  lines.push("*Lotes produzidos na semana:*");
+  lines.push(auto.lotsText || "Sem lotes produzidos no período selecionado.");
+  lines.push("");
   lines.push(`Quantidade de ensaios realizados (${shortDate(p.start)}) a (${shortDate(p.end)}): ${tests || "0"}`);
   lines.push(`Refugos: ${nf.format(auto.rejections)}`);
   lines.push("");
@@ -1064,6 +1097,12 @@ function renderWeeklyProductionReport() {
       <div class="weekly-report__auto-card"><span>Refugos automáticos</span><strong>${nf.format(auto.rejections)}</strong></div>
     </div>
 
+    <div class="weekly-report__lots">
+      <label>Relação automática dos lotes produzidos na semana
+        <textarea id="weeklyReportLotsText" readonly></textarea>
+      </label>
+    </div>
+
     <div class="weekly-report__manual">
       <label class="weekly-report__field--wide">Motivos dos refugos
         <textarea data-weekly-field="reasonText" id="weeklyReportReasonText"></textarea>
@@ -1087,6 +1126,7 @@ function renderWeeklyProductionReport() {
       </div>
     </div>
   </div>`;
+  $("weeklyReportLotsText").value = auto.lotsText || "";
   $("weeklyReportReasonText").value = manual.reasonText || "";
   $("weeklyReportAnalysis").value = manual.analysis || "";
   $("weeklyReportLotNotes").value = manual.lotNotes || "";

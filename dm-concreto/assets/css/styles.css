@@ -804,6 +804,14 @@ td strong { color: #fff; }
   font-size: 1.5rem;
   letter-spacing: -.04em;
 }
+.weekly-report__lots {
+  display: grid;
+  gap: 10px;
+}
+.weekly-report__lots textarea {
+  min-height: 140px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
 .weekly-report__preview {
   display: grid;
   gap: 10px;
