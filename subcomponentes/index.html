@@ -5,11 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Dashboard Rumo para controle visual de estoque e inspeções realizadas." />
   <title>Controle Visual Rumo | Subcomponentes</title>
+
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem("hq-theme") === "light") {
+          document.documentElement.setAttribute("data-theme", "light");
+        }
+      } catch (error) {}
+    })();
+  </script>
   <link rel="stylesheet" href="./assets/css/styles.css" />
   <script async id="xlsx-cdn" src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" onload="window.dispatchEvent(new Event('xlsx-ready'))"></script>
   <script defer src="./assets/js/app.js"></script>
 </head>
 <body>
+  <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Tema claro</button>
   <div class="app" id="app">
     <main class="content">
       <section class="panel">
@@ -19,5 +30,37 @@
     </main>
   </div>
   <noscript>Este painel precisa de JavaScript habilitado para funcionar.</noscript>
+
+  <script>
+    (function () {
+      var key = "hq-theme";
+      var button = document.getElementById("themeToggle");
+
+      function applyTheme(theme) {
+        var isLight = theme === "light";
+        if (isLight) {
+          document.documentElement.setAttribute("data-theme", "light");
+        } else {
+          document.documentElement.removeAttribute("data-theme");
+        }
+        if (button) {
+          button.textContent = isLight ? "Tema escuro" : "Tema claro";
+          button.setAttribute("aria-pressed", isLight ? "true" : "false");
+          button.setAttribute("aria-label", isLight ? "Mudar para tema escuro" : "Mudar para tema claro");
+        }
+      }
+
+      var current = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+      applyTheme(current);
+
+      if (button) {
+        button.addEventListener("click", function () {
+          var next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+          try { localStorage.setItem(key, next); } catch (error) {}
+          applyTheme(next);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

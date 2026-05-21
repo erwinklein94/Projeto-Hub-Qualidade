@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Página inicial para acessar os painéis de controle de qualidade." />
   <title>Controle de qualidade</title>
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem("hq-theme") === "light") {
+          document.documentElement.setAttribute("data-theme", "light");
+        }
+      } catch (error) {}
+    })();
+  </script>
   <style>
     :root {
       --navy: #003B67;
@@ -161,6 +170,91 @@
       font-size: 14px;
     }
 
+
+
+    .theme-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 30;
+      min-height: 42px;
+      padding: 10px 16px;
+      border: 1px solid rgba(255,255,255,.24);
+      border-radius: 999px;
+      color: var(--white);
+      background: rgba(255,255,255,.12);
+      box-shadow: 0 12px 28px rgba(0,0,0,.18);
+      font: inherit;
+      font-weight: 950;
+      cursor: pointer;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
+    }
+
+    .theme-toggle:hover,
+    .theme-toggle:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(255,221,0,.68);
+      background: rgba(255,255,255,.18);
+      outline: none;
+    }
+
+    html[data-theme="light"] {
+      --navy: #003B67;
+      --navy-2: #002E53;
+      --blue: #007FB6;
+      --green: #71E8A9;
+      --yellow: #FFDD00;
+      --white: #082f4f;
+      --line: rgba(0,59,103,.16);
+      --muted: rgba(0,46,83,.74);
+      --shadow: 0 20px 54px rgba(0, 59, 103, .13);
+    }
+
+    html[data-theme="light"] body {
+      color: var(--navy-2);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(113,232,169,.24), transparent 30%),
+        radial-gradient(circle at 88% 10%, rgba(0,59,103,.10), transparent 30%),
+        radial-gradient(circle at 50% 100%, rgba(255,221,0,.14), transparent 34%),
+        linear-gradient(160deg, #ffffff 0%, #f6fbff 56%, #eaf8f0 100%);
+    }
+
+    html[data-theme="light"] .home {
+      background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(246,251,255,.98));
+      border-color: rgba(0,59,103,.18);
+    }
+
+    html[data-theme="light"] .home::after {
+      background: radial-gradient(circle, rgba(113,232,169,.36), transparent 62%);
+    }
+
+    html[data-theme="light"] .button-card {
+      color: var(--navy-2);
+      background: rgba(255,255,255,.88);
+      border-color: rgba(0,59,103,.16);
+      box-shadow: 0 16px 38px rgba(0,59,103,.10);
+    }
+
+    html[data-theme="light"] .button-card:hover,
+    html[data-theme="light"] .button-card:focus-visible {
+      border-color: rgba(0,214,107,.46);
+      background: #ffffff;
+    }
+
+    html[data-theme="light"] .button-card .go {
+      color: var(--navy-2);
+    }
+
+    html[data-theme="light"] .theme-toggle {
+      color: #ffffff;
+      background: var(--navy-2);
+      border-color: rgba(0,59,103,.28);
+    }
+
+    html[data-theme="light"] footer {
+      color: rgba(0,46,83,.58);
+    }
+
     @media (max-width: 760px) {
       body { padding: 14px; }
       .home { border-radius: 28px; }
@@ -170,6 +264,7 @@
   </style>
 </head>
 <body>
+  <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Tema claro</button>
   <main class="home" aria-label="Página inicial do controle de qualidade">
     <div class="content">
       <section>
@@ -200,5 +295,37 @@
       <footer>Controle de qualidade • página inicial unificada</footer>
     </div>
   </main>
+
+  <script>
+    (function () {
+      var key = "hq-theme";
+      var button = document.getElementById("themeToggle");
+
+      function applyTheme(theme) {
+        var isLight = theme === "light";
+        if (isLight) {
+          document.documentElement.setAttribute("data-theme", "light");
+        } else {
+          document.documentElement.removeAttribute("data-theme");
+        }
+        if (button) {
+          button.textContent = isLight ? "Tema escuro" : "Tema claro";
+          button.setAttribute("aria-pressed", isLight ? "true" : "false");
+          button.setAttribute("aria-label", isLight ? "Mudar para tema escuro" : "Mudar para tema claro");
+        }
+      }
+
+      var current = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+      applyTheme(current);
+
+      if (button) {
+        button.addEventListener("click", function () {
+          var next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+          try { localStorage.setItem(key, next); } catch (error) {}
+          applyTheme(next);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
