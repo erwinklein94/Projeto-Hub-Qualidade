@@ -35,7 +35,7 @@
     <nav class="tabs" aria-label="Navegação do painel">
       <button class="tab-button active" type="button" data-tab="importTab">Importar planilha</button>
       <button class="tab-button" type="button" data-tab="generalTab">Dashboard geral</button>
-      <button class="tab-button" type="button" data-tab="productionTab">Produção e séries</button>
+      <button class="tab-button" type="button" data-tab="productionTab">Produção</button>
       <button class="tab-button" type="button" data-tab="releaseTestsTab">Ensaios de liberação</button>
       <button class="tab-button" type="button" data-tab="rejectionsTab">Refugos / Reprovas</button>
     </nav>
@@ -117,19 +117,17 @@
       </section>
     </section>
 
-    <section id="productionTab" class="tab-panel" aria-label="Produção e séries">
+    <section id="productionTab" class="tab-panel" aria-label="Produção">
       <section class="filter-card" aria-label="Filtros de produção">
         <div>
-          <h2>Produção e séries</h2>
-          <p>Controle de produção, lotes e gatilhos de ensaio de liberação.</p>
+          <h2>Produção</h2>
+          <p>Controle de produção e lotes fabricados.</p>
         </div>
         <div class="filter-grid">
           <label>Data inicial<input id="prodDateFrom" type="date" /></label>
           <label>Data final<input id="prodDateTo" type="date" /></label>
           <label>Projeto / bitola<select id="prodProjectFilter"><option value="todos">Todos</option></select></label>
-          <label>Série<select id="prodSerieFilter"><option value="todos">Todas</option></select></label>
-          <label>Status<select id="prodStatusFilter"><option value="todos">Todos</option><option value="ensaio">Ensaio obrigatório</option><option value="proximo">Próximo do ensaio</option><option value="andamento">Em andamento</option><option value="planejado">Planejado / sem produção</option></select></label>
-          <label>Busca<input id="prodSearch" placeholder="Lote, projeto, série ou tipo" /></label>
+          <label>Busca<input id="prodSearch" placeholder="Lote, projeto ou tipo" /></label>
         </div>
       </section>
 
@@ -143,10 +141,6 @@
         <article class="panel">
           <div class="panel-head"><div><h3>Produção por semana</h3><p>Quantidade fabricada por semana.</p></div></div>
           <div id="productionWeeklyChart"></div>
-        </article>
-        <article class="panel">
-          <div class="panel-head"><div><h3>Séries de liberação</h3><p>Progresso por regra de 2.000 peças ou 10 lotes.</p></div></div>
-          <div id="seriesCards"></div>
         </article>
         <article class="panel panel--wide">
           <div class="panel-head"><div><h3>Itens de produção</h3><p>Lista dos lotes filtrados.</p></div></div>

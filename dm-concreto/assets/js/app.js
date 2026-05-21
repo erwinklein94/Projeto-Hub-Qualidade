@@ -262,7 +262,7 @@ function resetFilters() {
     const el = $(id);
     if (el) el.value = "";
   });
-  ["dashProjectFilter", "prodProjectFilter", "prodSerieFilter", "prodStatusFilter", "relProjectFilter", "relStatusFilter", "rejProjectFilter", "rejReasonFilter"].forEach(id => {
+  ["dashProjectFilter", "prodProjectFilter", "relProjectFilter", "relStatusFilter", "rejProjectFilter", "rejReasonFilter"].forEach(id => {
     const el = $(id);
     if (el) el.value = "todos";
   });
@@ -281,7 +281,6 @@ function populateFilters() {
   const groups = [...state.production.map(row => row.grupo), ...state.rejections.map(row => row.grupo)];
   setOptions("dashProjectFilter", groups);
   setOptions("prodProjectFilter", state.production.map(row => row.grupo));
-  setOptions("prodSerieFilter", state.production.map(row => row.serie), "Todas");
   setOptions("relProjectFilter", state.production.map(row => row.projeto));
   setOptions("rejProjectFilter", state.rejections.map(row => row.grupo));
   setOptions("rejReasonFilter", state.rejections.map(row => row.motivoComum));
@@ -313,8 +312,8 @@ function getProductionFilters() {
     from: $("prodDateFrom")?.value || "",
     to: $("prodDateTo")?.value || "",
     project: $("prodProjectFilter")?.value || "todos",
-    serie: $("prodSerieFilter")?.value || "todos",
-    status: $("prodStatusFilter")?.value || "todos",
+    serie: "todos",
+    status: "todos",
     search: normalizeKey($("prodSearch")?.value || "")
   };
 }
@@ -768,18 +767,14 @@ function renderInsights(production, rejections, series) {
 
 function renderProduction() {
   const filters = getProductionFilters();
-  const allFiltered = filterProduction(state.production, filters);
-  const seriesAll = computeSeries(allFiltered);
-  const series = filters.status && filters.status !== "todos" ? seriesAll.filter(item => item.status === filters.status) : seriesAll;
-  const rows = filters.status && filters.status !== "todos" ? allFiltered.filter(row => series.some(item => item.key === `${row.grupo}|||${row.serie}`)) : allFiltered;
+  const rows = filterProduction(state.production, filters);
   const totalProduction = sum(rows, "quantidade");
   const lotCount = countUnique(rows, row => row.lote);
   renderKpis("productionKpis", [
     kpi("Produção", nf.format(totalProduction), "dormentes filtrados"),
     kpi("Lotes", nf.format(lotCount), "lotes únicos"),
     kpi("Projetos / bitolas", nf.format(countUnique(rows, row => row.grupo)), "famílias filtradas"),
-    kpi("Séries", nf.format(series.length), "séries no recorte"),
-    kpi("Ensaios obrigatórios", nf.format(series.filter(item => item.status === "ensaio").length), "atingiram regra")
+    kpi("Tipos de dormente", nf.format(countUnique(rows, row => row.tipo)), "modelos filtrados")
   ]);
 
   renderRankList("productionBalance", groupBy(rows, row => row.grupo, row => row.quantidade || 0), {
@@ -796,7 +791,6 @@ function renderProduction() {
     return map;
   }, new Map()).values()).sort((a, b) => a.sort.localeCompare(b.sort)).slice(-16);
   renderVerticalChart("productionWeeklyChart", weekly, [{ field: "production", label: "Produção" }]);
-  renderSeriesCards(series.slice(0, 12));
   renderProductionTable(rows.slice(0, 160));
 }
 
@@ -831,13 +825,12 @@ function renderProductionTable(rows) {
     return;
   }
   target.innerHTML = `<div class="table-wrap"><table>
-    <thead><tr><th>Data</th><th>Lote</th><th>Projeto / Bitola</th><th>Tipo de dormente</th><th>Série</th><th>Quantidade</th></tr></thead>
+    <thead><tr><th>Data</th><th>Lote</th><th>Projeto / Bitola</th><th>Tipo de dormente</th><th>Quantidade</th></tr></thead>
     <tbody>${rows.map(row => `<tr>
       <td>${formatDate(row.data)}</td>
       <td><span class="pill">${escapeHtml(row.lote)}</span></td>
       <td><strong>${escapeHtml(row.grupo)}</strong></td>
       <td>${escapeHtml(row.tipo)}</td>
-      <td>${escapeHtml(row.serie)}</td>
       <td><strong>${nf.format(row.quantidade || 0)}</strong></td>
     </tr>`).join("")}</tbody>
   </table></div>`;
@@ -1022,7 +1015,7 @@ function renderEmptyDashboards() {
     kpi("Séries em ensaio", "0", "importe a planilha")
   ]);
   renderKpis("productionKpis", [
-    kpi("Produção", "0"), kpi("Lotes", "0"), kpi("Projetos / bitolas", "0"), kpi("Séries", "0"), kpi("Ensaios obrigatórios", "0")
+    kpi("Produção", "0"), kpi("Lotes", "0"), kpi("Projetos / bitolas", "0"), kpi("Tipos de dormente", "0")
   ]);
   renderKpis("releaseKpis", [
     kpi("Produção contada", "0"), kpi("Lotes contados", "0"), kpi("Projetos", "0"), kpi("Ensaios obrigatórios", "0"), kpi("Próximos", "0")
@@ -1030,7 +1023,7 @@ function renderEmptyDashboards() {
   renderKpis("rejectionKpis", [
     kpi("Ocorrências", "0"), kpi("Taxa NC", "0%"), kpi("Lotes com NC", "0"), kpi("Motivos", "0"), kpi("Moldes", "0")
   ]);
-  ["weeklyQualityChart", "productionByProject", "rejectionByReason", "criticalLots", "qualityInsights", "productionBalance", "productionWeeklyChart", "seriesCards", "productionTable", "releaseCycleCards", "releasePriorityList", "releaseRuleBox", "releaseLotsTable", "rejectionWeeklyChart", "ncByMaterial", "detailedReasons", "moldCavityRanking", "rejectionTable"].forEach(id => {
+  ["weeklyQualityChart", "productionByProject", "rejectionByReason", "criticalLots", "qualityInsights", "productionBalance", "productionWeeklyChart", "productionTable", "releaseCycleCards", "releasePriorityList", "releaseRuleBox", "releaseLotsTable", "rejectionWeeklyChart", "ncByMaterial", "detailedReasons", "moldCavityRanking", "rejectionTable"].forEach(id => {
     const el = $(id);
     if (el) el.innerHTML = emptyState("Painel zerado", "Importe uma planilha para visualizar os dados.");
   });
@@ -1104,7 +1097,7 @@ function setupEvents() {
 
   [
     "dashDateFrom", "dashDateTo", "dashProjectFilter", "dashSearch",
-    "prodDateFrom", "prodDateTo", "prodProjectFilter", "prodSerieFilter", "prodStatusFilter", "prodSearch",
+    "prodDateFrom", "prodDateTo", "prodProjectFilter", "prodSearch",
     "relDateFrom", "relDateTo", "relProjectFilter", "relStatusFilter", "relSearch",
     "rejDateFrom", "rejDateTo", "rejProjectFilter", "rejReasonFilter", "rejLotFilter", "rejSearch"
   ].forEach(id => {
