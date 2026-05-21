@@ -619,6 +619,55 @@ input:focus, select:focus { border-color: var(--yellow); box-shadow: 0 0 0 3px r
 .series-progress { display: grid; gap: 9px; margin-top: 12px; }
 .progress-label { display: flex; justify-content: space-between; gap: 12px; color: rgba(255,255,255,.68); font-size: .78rem; font-weight: 850; }
 
+.release-lots {
+  margin-top: 13px;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 16px;
+  background: rgba(255,255,255,.045);
+}
+.release-lots__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 9px;
+  color: rgba(255,255,255,.68);
+  font-size: .72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.release-lots__head strong {
+  color: var(--yellow);
+  font-size: .72rem;
+  white-space: nowrap;
+}
+.release-lot-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.lot-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 9px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 999px;
+  color: #cfefff;
+  background: rgba(0,166,214,.13);
+  font-size: .76rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+.lot-chip--latest {
+  color: var(--navy-2);
+  background: var(--yellow);
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 4px rgba(255,221,0,.12);
+}
+
 .table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid rgba(255,255,255,.12); }
 table { width: 100%; min-width: 880px; border-collapse: collapse; color: rgba(255,255,255,.82); font-size: .84rem; }
 th, td { padding: 10px 9px; border-bottom: 1px solid rgba(255,255,255,.10); text-align: left; vertical-align: top; }

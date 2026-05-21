@@ -262,7 +262,7 @@ function resetFilters() {
     const el = $(id);
     if (el) el.value = "";
   });
-  ["dashProjectFilter", "prodProjectFilter", "relProjectFilter", "relStatusFilter", "rejProjectFilter", "rejReasonFilter"].forEach(id => {
+  ["dashProjectFilter", "prodProjectFilter", "relProjectFilter", "relBitolaFilter", "relStatusFilter", "rejProjectFilter", "rejReasonFilter"].forEach(id => {
     const el = $(id);
     if (el) el.value = "todos";
   });
@@ -282,6 +282,7 @@ function populateFilters() {
   setOptions("dashProjectFilter", groups);
   setOptions("prodProjectFilter", state.production.map(row => row.grupo));
   setOptions("relProjectFilter", state.production.map(row => row.projeto));
+  setOptions("relBitolaFilter", state.production.map(row => row.bitola?.name || row.bitola?.code), "Todas");
   setOptions("rejProjectFilter", state.rejections.map(row => row.grupo));
   setOptions("rejReasonFilter", state.rejections.map(row => row.motivoComum));
 }
@@ -323,6 +324,7 @@ function getReleaseFilters() {
     from: $("relDateFrom")?.value || "",
     to: $("relDateTo")?.value || "",
     project: $("relProjectFilter")?.value || "todos",
+    bitola: $("relBitolaFilter")?.value || "todos",
     status: $("relStatusFilter")?.value || "todos",
     search: normalizeKey($("relSearch")?.value || "")
   };
@@ -356,6 +358,7 @@ function filterReleaseProduction(rows, filters) {
   return rows.filter(row => {
     if (!compareDateInRange(row.data, filters.from, filters.to)) return false;
     if (filters.project && filters.project !== "todos" && row.projeto !== filters.project) return false;
+    if (filters.bitola && filters.bitola !== "todos" && row.bitola?.name !== filters.bitola && row.bitola?.code !== filters.bitola) return false;
     if (filters.search) {
       const haystack = normalizeKey(`${row.data} ${row.lote} ${row.projeto} ${row.tipo} ${row.serie} ${row.grupo}`);
       if (!haystack.includes(filters.search)) return false;
@@ -656,7 +659,7 @@ function computeReleaseCycles(rows) {
         quantidade: lot.quantidade,
         linhaPlanilha: lot.linhaPlanilha
       };
-    }).sort((a, b) => Number(a.lote) - Number(b.lote) || String(a.data).localeCompare(String(b.data)));
+    }).sort((a, b) => String(a.data).localeCompare(String(b.data)) || Number(a.lote) - Number(b.lote) || Number(a.linhaPlanilha) - Number(b.linhaPlanilha));
 
     return {
       ...item,
@@ -675,6 +678,7 @@ function computeReleaseCycles(rows) {
       bitolaResumo: Array.from(item.bitolas).sort().join(" / ") || "-",
       tipoResumo: Array.from(item.tipos).slice(0, 3).join(" / ") || "-",
       aberta: isOpenReleaseSerie(item.serie),
+      ultimoLote: lotRows.length ? lotRows[lotRows.length - 1].lote : "",
       lotRows
     };
   }).sort((a, b) => {
@@ -863,6 +867,17 @@ function renderReleaseTests() {
   renderReleaseLotsTable(cycles);
 }
 
+function releaseLotsHtml(item) {
+  if (!item.lotRows?.length) return "";
+  return `<div class="release-lots">
+    <div class="release-lots__head"><span>Lotes da série</span><strong>Último lote: ${escapeHtml(item.ultimoLote || "-")}</strong></div>
+    <div class="release-lot-chips">${item.lotRows.map(lot => {
+      const isLast = String(lot.lote) === String(item.ultimoLote);
+      return `<span class="lot-chip ${isLast ? "lot-chip--latest" : ""}" title="${isLast ? "Último lote da série" : "Lote da série"}">${escapeHtml(lot.lote)}</span>`;
+    }).join("")}</div>
+  </div>`;
+}
+
 function renderReleaseCycleCards(cycles) {
   const target = $("releaseCycleCards");
   if (!target) return;
@@ -885,6 +900,7 @@ function renderReleaseCycleCards(cycles) {
         <div><span>Faltam peças</span><strong>${nf.format(item.saldoQuantidade)}</strong></div>
         <div><span>Faltam lotes</span><strong>${nf.format(item.saldoLotes)}</strong></div>
       </div>
+      ${releaseLotsHtml(item)}
       <div class="series-progress">
         <div><div class="progress-label"><span>Dormentes por projeto</span><span>${nf.format(item.quantidade)} / ${nf.format(LIMIT_QTY)}</span></div><div class="progress-track"><span style="width:${item.qtyPct}%"></span></div></div>
         <div><div class="progress-label"><span>Lotes por projeto</span><span>${nf.format(item.lotCount)} / ${nf.format(LIMIT_LOTS)}</span></div><div class="progress-track progress-track--yellow"><span style="width:${item.lotPct}%"></span></div></div>
@@ -1098,7 +1114,7 @@ function setupEvents() {
   [
     "dashDateFrom", "dashDateTo", "dashProjectFilter", "dashSearch",
     "prodDateFrom", "prodDateTo", "prodProjectFilter", "prodSearch",
-    "relDateFrom", "relDateTo", "relProjectFilter", "relStatusFilter", "relSearch",
+    "relDateFrom", "relDateTo", "relProjectFilter", "relBitolaFilter", "relStatusFilter", "relSearch",
     "rejDateFrom", "rejDateTo", "rejProjectFilter", "rejReasonFilter", "rejLotFilter", "rejSearch"
   ].forEach(id => {
     const el = $(id);
