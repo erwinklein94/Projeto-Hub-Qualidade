@@ -280,6 +280,11 @@ h1 {
 }
 .btn--primary { color: var(--navy-2); background: var(--yellow); border-color: var(--yellow); }
 .btn--ghost { background: rgba(255,255,255,.04); }
+.production-week-shortcut {
+  margin-top: 14px;
+  text-decoration: none;
+  width: fit-content;
+}
 .check-list { margin: 14px 0 0; padding-left: 18px; color: rgba(255,255,255,.76); line-height: 1.55; }
 .check-list li + li { margin-top: 8px; }
 
@@ -812,6 +817,61 @@ td strong { color: #fff; }
   min-height: 140px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
+.weekly-report__averages {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 18px;
+  background: rgba(255,255,255,.045);
+}
+.weekly-report__section-head h4 {
+  margin: 0;
+  font-size: 1.02rem;
+  letter-spacing: -.02em;
+}
+.weekly-report__section-head p {
+  margin: 5px 0 0;
+  color: rgba(255,255,255,.68);
+  font-size: .88rem;
+}
+.weekly-average-list {
+  display: grid;
+  gap: 8px;
+}
+.weekly-average-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.5fr) repeat(4, minmax(110px, 1fr));
+  gap: 10px;
+  align-items: center;
+  padding: 11px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 14px;
+  background: rgba(255,255,255,.045);
+}
+.weekly-average-row__name {
+  color: #fff;
+  font-weight: 950;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.weekly-average-row span {
+  display: block;
+  color: rgba(255,255,255,.56);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: .61rem;
+  font-weight: 950;
+}
+.weekly-average-row strong {
+  display: block;
+  margin-top: 4px;
+  color: #fff;
+  font-size: .98rem;
+}
+.weekly-report__mini-empty {
+  min-height: 110px;
+}
 .weekly-report__preview {
   display: grid;
   gap: 10px;
@@ -836,9 +896,12 @@ td strong { color: #fff; }
   .weekly-report__filters,
   .weekly-report__manual,
   .weekly-report__auto { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .weekly-average-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .weekly-average-row__name { grid-column: 1 / -1; }
 }
 @media (max-width: 760px) {
   .weekly-report__filters,
   .weekly-report__manual,
   .weekly-report__auto { grid-template-columns: 1fr; }
+  .weekly-average-row { grid-template-columns: 1fr; }
 }

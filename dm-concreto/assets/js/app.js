@@ -897,6 +897,47 @@ function weeklyProducedLotsPlainHtml(productionRows) {
   return escapeHtml(text);
 }
 
+
+function weeklyProjectAverageRows(productionRows) {
+  const map = new Map();
+  productionRows.forEach(row => {
+    const project = clean(row.grupo || row.projeto || row.tipo || "Projeto não informado");
+    const item = map.get(project) || { project, total: 0, lots: new Set(), days: new Set() };
+    item.total += row.quantidade || 0;
+    if (row.lote) item.lots.add(String(row.lote));
+    if (row.data) item.days.add(row.data);
+    map.set(project, item);
+  });
+  return Array.from(map.values())
+    .map(item => {
+      const dayCount = Math.max(item.days.size, 1);
+      const lotCount = Math.max(item.lots.size, 1);
+      return {
+        project: item.project,
+        total: item.total,
+        dayCount: item.days.size,
+        lotCount: item.lots.size,
+        averagePerProductionDay: item.total / dayCount,
+        averagePerLot: item.total / lotCount
+      };
+    })
+    .filter(item => item.total > 0)
+    .sort((a, b) => b.total - a.total || a.project.localeCompare(b.project, "pt-BR", { numeric: true }));
+}
+
+function weeklyProjectAveragesHtml(projectAverages) {
+  if (!projectAverages.length) {
+    return `<div class="empty-state weekly-report__mini-empty"><strong>Sem produção no período</strong><span>Selecione uma semana com produção para ver as médias por projeto/bitola.</span></div>`;
+  }
+  return `<div class="weekly-average-list">${projectAverages.map(item => `<div class="weekly-average-row">
+    <div class="weekly-average-row__name">${escapeHtml(item.project)}</div>
+    <div><span>Total semana</span><strong>${nf.format(Math.round(item.total))}</strong></div>
+    <div><span>Média por dia produzido</span><strong>${nf.format(Math.round(item.averagePerProductionDay))}</strong></div>
+    <div><span>Média por lote</span><strong>${nf.format(Math.round(item.averagePerLot))}</strong></div>
+    <div><span>Lotes / dias</span><strong>${nf.format(item.lotCount)} / ${nf.format(item.dayCount)}</strong></div>
+  </div>`).join("")}</div>`;
+}
+
 function countWeeklyReleaseTests(productionRows) {
   return new Set(productionRows
     .filter(row => row.serie && !isOpenReleaseSerie(row.serie))
@@ -926,6 +967,7 @@ function getWeeklyReportAutoData(startIso) {
     rejections: rejectionRows.length,
     reasonText: weeklyReasonText(rejectionRows),
     lotsText: weeklyProducedLotsText(productionRows),
+    projectAverages: weeklyProjectAverageRows(productionRows),
     defaultCavanDate: addDaysIso(period.end, 2)
   };
 }
@@ -1101,6 +1143,14 @@ function renderWeeklyProductionReport() {
       <label>Relação automática dos lotes produzidos na semana
         <textarea id="weeklyReportLotsText" readonly></textarea>
       </label>
+    </div>
+
+    <div class="weekly-report__averages">
+      <div class="weekly-report__section-head">
+        <h4>Média de produção por projeto/bitola</h4>
+        <p>Informação de apoio para prever a próxima semana. Não entra no texto copiado nem no PDF.</p>
+      </div>
+      ${weeklyProjectAveragesHtml(auto.projectAverages || [])}
     </div>
 
     <div class="weekly-report__manual">
