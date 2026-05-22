@@ -53,6 +53,17 @@
       box-shadow: var(--shadow);
       position: relative;
       overflow: hidden;
+      isolation: isolate;
+    }
+
+    .home::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("https://abolbrasil.org.br/wordpress/wp-content/uploads/2022/02/rumo-tera-comunicacao-via-satelite-da-globalsat-e-inmarsat-em-ferrovias.jpg") center center / cover no-repeat;
+      opacity: .14;
+      pointer-events: none;
+      z-index: 0;
     }
 
     .home::after {
@@ -112,8 +123,9 @@
 
     .actions {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 1fr;
       gap: 18px;
+      width: min(760px, 100%);
     }
 
     .button-card {
@@ -224,6 +236,10 @@
       border-color: rgba(0,59,103,.18);
     }
 
+    html[data-theme="light"] .home::before {
+      opacity: .11;
+    }
+
     html[data-theme="light"] .home::after {
       background: radial-gradient(circle, rgba(113,232,169,.36), transparent 62%);
     }
@@ -275,18 +291,18 @@
       </section>
 
       <nav class="actions" aria-label="Escolha do painel">
-        <a class="button-card" href="./subcomponentes/">
-          <span>
-            <strong>Subcomponentes</strong>
-            <p>Acesse o controle visual de estoque, inspeções realizadas e cards por subcomponente.</p>
-          </span>
-          <span class="go">Abrir painel →</span>
-        </a>
-
         <a class="button-card" href="./dm-concreto/">
           <span>
             <strong>DM de Concreto</strong>
             <p>Acesse o controle de produção, séries de liberação, refugos e reprovas.</p>
+          </span>
+          <span class="go">Abrir painel →</span>
+        </a>
+
+        <a class="button-card" href="./subcomponentes/">
+          <span>
+            <strong>Subcomponentes</strong>
+            <p>Acesse o controle visual de estoque, inspeções realizadas e cards por subcomponente.</p>
           </span>
           <span class="go">Abrir painel →</span>
         </a>
