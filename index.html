@@ -86,14 +86,16 @@
     }
 
     .brand {
-      display: inline-block;
-      font-weight: 950;
-      letter-spacing: -.04em;
-      font-size: clamp(42px, 7vw, 66px);
-      line-height: .88;
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
     }
 
-    .brand span { color: var(--blue); }
+    .brand img {
+      display: block;
+      width: clamp(150px, 24vw, 230px);
+      height: auto;
+    }
 
     .eyebrow {
       margin: 0 0 12px;
@@ -284,7 +286,7 @@
   <main class="home" aria-label="Página inicial do controle de qualidade">
     <div class="content">
       <section>
-        <div class="brand" aria-label="Rumo">rum<span>o</span></div>
+        <div class="brand" aria-label="Rumo"><img src="https://logospng.org/download/rumo-logistica/logo-rumo-logistica-1024.png" alt="Rumo Logística" /></div>
         <p class="eyebrow">Painéis de inspeção</p>
         <h1>Controle de qualidade</h1>
         <p class="subtitle">Escolha qual painel deseja acessar. Os sistemas estão no mesmo projeto, mas continuam separados para manter as funcionalidades de cada um.</p>
