@@ -115,9 +115,15 @@
       font-weight: 950;
     }
 
+    .intro {
+      display: grid;
+      justify-items: center;
+      text-align: center;
+    }
+
     .subtitle {
-      margin: 18px 0 0;
-      max-width: 760px;
+      margin: 18px auto 0;
+      max-width: 520px;
       color: var(--muted);
       font-size: clamp(16px, 2vw, 20px);
       line-height: 1.55;
@@ -189,6 +195,7 @@
     footer {
       color: rgba(255,255,255,.55);
       font-size: 14px;
+      text-align: center;
     }
 
 
@@ -292,11 +299,10 @@
   <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Tema claro</button>
   <main class="home" aria-label="Página inicial do controle de qualidade">
     <div class="content">
-      <section>
+      <section class="intro">
         <div class="brand" aria-label="Rumo"><img src="https://logospng.org/download/rumo-logistica/logo-rumo-logistica-1024.png" alt="Rumo Logística" /></div>
-        <p class="eyebrow">Painéis de inspeção</p>
         <h1>Controle de qualidade</h1>
-        <p class="subtitle">Escolha qual painel deseja acessar. Os sistemas estão no mesmo projeto, mas continuam separados para manter as funcionalidades de cada um.</p>
+        <p class="subtitle">Escolha qual painel deseja acessar.</p>
       </section>
 
       <nav class="actions" aria-label="Escolha do painel">
@@ -325,7 +331,7 @@
         </a>
       </nav>
 
-      <footer>Controle de qualidade • página inicial unificada</footer>
+      <footer>Controle de qualidade • Coordenação Engenharia de Qualidade &amp; Homologação de Materiais de Via .</footer>
     </div>
   </main>
 
