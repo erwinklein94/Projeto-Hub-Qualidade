@@ -14,3 +14,14 @@ Este pacote aplica no projeto unificado o mesmo padrão visual Rumo usado nos ou
 ## Segurança
 
 Não houve alteração nas regras de cálculo, importação de planilhas, dados ou lógica principal dos painéis. As mudanças são visuais e de organização de tela.
+
+## Correção de links do Hub
+
+Links finais aplicados nos cards principais:
+
+- DM de Concreto: https://erwinklein94.github.io/Sistema-Qualidade-Completo-Concreto/
+- Subcomponentes: https://erwinklein94.github.io/Sistema-Qualidade-Completo-Subcomponentes/
+- Leitor de Data Book: https://erwinklein94.github.io/Leitor-Iauditor/
+- Leitor de Iauditor: https://erwinklein94.github.io/Leitor-Iauditor/
+- Guia do Inspetor Padrão: http://www.guiadoinspetorpadrao.com.br/
+
