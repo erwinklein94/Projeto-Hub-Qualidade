@@ -21,7 +21,7 @@ Links finais aplicados nos cards principais:
 
 - DM de Concreto: https://erwinklein94.github.io/Sistema-Qualidade-Completo-Concreto/
 - Subcomponentes: https://erwinklein94.github.io/Sistema-Qualidade-Completo-Subcomponentes/
-- Leitor de Data Book: https://erwinklein94.github.io/Leitor-Iauditor/
+- Leitor de Data Book: https://erwinklein94.github.io/Leitor-Databooks/
 - Leitor de Iauditor: https://erwinklein94.github.io/Leitor-Iauditor/
 - Guia do Inspetor Padrão: http://www.guiadoinspetorpadrao.com.br/
 
