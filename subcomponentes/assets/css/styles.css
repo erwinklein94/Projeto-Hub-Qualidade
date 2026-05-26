@@ -206,3 +206,166 @@ html[data-theme="light"] .axis-line{stroke:rgba(5,42,82,.30)}
 html[data-theme="light"] .grid-line{stroke:rgba(5,42,82,.10)}
 html[data-theme="light"] footer{background:rgba(255,255,255,.72);border-color:rgba(0,59,103,.12)}
 @media print{.theme-toggle{display:none!important}}
+
+
+/* =====================================================================
+   VISUAL RUMO COMPACTO / ZOOM OUT — SUBCOMPONENTES
+   Reduz escala e reorganiza cabeçalho, abas, KPIs, gráficos, cards e
+   tabelas para manter o mesmo padrão dos outros sites Rumo.
+   ===================================================================== */
+html { font-size: 14px; }
+body { font-size: 13px; line-height: 1.42; }
+:root {
+  --radius: 20px;
+  --shadow: 0 13px 36px rgba(0, 15, 30, .22);
+}
+.app { max-width: 1580px; padding: 16px 18px 28px; }
+.hero {
+  border-radius: 22px;
+  padding: 15px 17px;
+  box-shadow: 0 13px 36px rgba(0, 15, 30, .18);
+}
+.hero:after { width: 230px; height: 230px; right: -95px; top: -95px; }
+.back-link {
+  min-height: 34px;
+  padding: 7px 11px;
+  border-radius: 11px;
+  font-size: 12px;
+  margin-bottom: 11px;
+}
+.hero-top { gap: 14px; }
+.brand-lockup { gap: 12px; }
+.brand-row { gap: 12px; }
+.logo { padding-right: 12px; }
+.logo__img { width: clamp(112px, 12vw, 148px); }
+.divider { height: 44px; }
+.eyebrow { margin-bottom: 5px; font-size: 9.8px; letter-spacing: .20em; }
+h1 { font-size: clamp(24px, 2.35vw, 31px); line-height: 1.05; max-width: 640px; }
+.base-badge {
+  min-width: 215px;
+  max-width: 310px;
+  padding: 9px 11px;
+  border-radius: 14px;
+  gap: 5px 8px;
+}
+.status-dot { width: 8px; height: 8px; box-shadow: 0 0 0 4px rgba(255,221,0,.10); }
+.base-kicker { font-size: 8.8px; letter-spacing: .13em; }
+.base-badge strong { font-size: 11.5px; }
+.hero-summary {
+  margin-top: 10px;
+  grid-template-columns: minmax(250px,1fr) minmax(360px, auto);
+  gap: 14px;
+}
+.hero p.desc { max-width: 620px; font-size: 12.3px; line-height: 1.42; }
+.hero-metrics { min-width: 360px; grid-template-columns: repeat(3,minmax(110px,1fr)); gap: 7px; }
+.tile { min-height: 62px; padding: 9px 11px; border-radius: 15px; }
+.tile-label { font-size: 8.8px; letter-spacing: .13em; }
+.tile-value { margin-top: 5px; font-size: 21px; }
+.tabs { margin-top: 12px; gap: 7px; }
+.tab-btn {
+  flex: 1 1 154px;
+  min-height: 39px;
+  gap: 7px;
+  padding: 8px 10px;
+  border-radius: 13px;
+  font-size: 11.5px;
+}
+.tab-icon { width: 22px; height: 22px; border-radius: 8px; font-size: 12px; }
+.content { margin-top: 14px; }
+.grid { gap: 13px; }
+.grid-2 { grid-template-columns: 1.05fr .95fr; }
+.panel {
+  padding: 15px;
+  border-radius: 18px;
+  box-shadow: 0 12px 32px rgba(0, 15, 30, .20);
+}
+.panel-head { margin-bottom: 12px; gap: 10px; }
+.panel-title { gap: 9px; }
+.icon-box { width: 36px; height: 36px; border-radius: 12px; font-size: 18px; }
+h2 { font-size: 17px; }
+.subtitle { margin-top: 3px; font-size: 12px; }
+.kpi {
+  min-height: 96px;
+  padding: 14px;
+  border-radius: 17px;
+}
+.kpi:after { width: 86px; height: 86px; right: -32px; top: -34px; }
+.kpi-title { font-size: 9.6px; letter-spacing: .13em; }
+.kpi-value {
+  margin-top: 7px;
+  font-size: clamp(24px, 2.3vw, 30px);
+  line-height: 1;
+  letter-spacing: -.045em;
+  white-space: nowrap;
+  overflow: visible;
+}
+.kpi-sub { margin-top: 5px; font-size: 11.5px; line-height: 1.25; }
+.kpi-icon { width: 36px; height: 36px; border-radius: 12px; font-size: 18px; }
+.filter-grid { gap: 10px; }
+label.control { gap: 5px; font-size: 11.5px; }
+select, input[type="search"] { padding: 8px 10px; border-radius: 12px; font-size: 12px; min-height: 34px; }
+.search-wrap { border-radius: 12px; padding: 0 10px; }
+.search-wrap input { padding: 8px 0; }
+.drop { padding: 22px; border-radius: 20px; }
+.upload-circle { width: 58px; height: 58px; margin-bottom: 12px; font-size: 30px; }
+.primary, .secondary { padding: 8px 12px; border-radius: 13px; font-size: 12px; }
+.message { margin-top: 10px; padding: 9px 11px; font-size: 12px; }
+.hint { padding: 11px; border-radius: 14px; font-size: 12.2px; line-height: 1.42; }
+.bar-list { gap: 9px; }
+.bar-row { grid-template-columns: minmax(200px,1.15fr) 2.3fr 74px; gap: 9px; font-size: 11.5px; }
+.bar-track { height: 12px; }
+.bar-value { min-width: 70px; }
+.donut-wrap { grid-template-columns: 136px 1fr; gap: 16px; min-height: 175px; }
+.donut { width: 136px; height: 136px; }
+.donut:after { inset: 34px; }
+.legend { gap: 7px; }
+.legend-row { gap: 8px; font-size: 12px; }
+.dot { width: 9px; height: 9px; }
+.svg-chart { height: 250px; border-radius: 16px; }
+.axis-text { font-size: 11px; }
+.axis-label { font-size: 12px; }
+.table-wrap { border-radius: 15px; }
+.scroll { max-height: 420px; }
+table { min-width: 900px; font-size: 12px; }
+th { padding: 8px 9px; font-size: 9.8px; letter-spacing: .09em; }
+td { padding: 8px 9px; }
+.pill { padding: 4px 8px; font-size: 10.5px; }
+.cards { gap: 13px; }
+.card { padding: 15px; border-radius: 18px; }
+.card:after { width: 92px; height: 92px; right: -32px; top: -32px; }
+.card h3 { font-size: 16px; margin-top: 5px; }
+.card-grid { gap: 8px; margin-top: 12px; }
+.mini { padding: 9px; border-radius: 12px; }
+.mini .num { font-size: 19px; margin-top: 4px; }
+.meta { margin-top: 10px; font-size: 12px; line-height: 1.42; }
+.dual-list { gap: 10px; }
+.dual-row { grid-template-columns:minmax(220px,1fr) 2.4fr; gap: 10px; padding: 9px; border-radius: 14px; }
+.dual-bars { gap: 6px; }
+.dual-line { grid-template-columns: 118px 1fr 70px; gap: 8px; font-size: 10.8px; }
+.dual-track { height: 10px; }
+.compare-table { min-width: 1100px; }
+.delta { min-width: 64px; padding: 4px 7px; }
+.empty { padding: 24px 14px; border-radius: 18px; font-size: 12.2px; }
+footer { margin-top: 14px; padding: 13px; border-radius: 18px; font-size: 12px; }
+.theme-toggle { top: 12px; right: 12px; min-height: 35px; padding: 7px 12px; font-size: 12px; }
+@media (min-width: 1180px) {
+  .grid-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width:1100px){
+  .hero-summary { grid-template-columns: 1fr; }
+  .hero-metrics { min-width: 0; }
+  .grid-2 { grid-template-columns: 1fr; }
+}
+@media (max-width:760px){
+  .app { padding: 10px; }
+  .hero { padding: 14px; border-radius: 19px; }
+  .brand-lockup { gap: 10px; }
+  h1 { font-size: 22px; }
+  .hero-metrics, .grid-4, .grid-5, .grid-3, .cards { grid-template-columns: 1fr; }
+  .tab-btn { flex-basis: 100%; justify-content: flex-start; }
+  .bar-row, .dual-row, .dual-line { grid-template-columns: 1fr; }
+  .donut-wrap { grid-template-columns: 1fr; }
+  .svg-chart { height: 230px; }
+}

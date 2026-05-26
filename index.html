@@ -4,11 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Página inicial para acessar os painéis de controle de qualidade." />
+  <link rel="icon" type="image/png" href="assets/brand/favicon-rumo.png" />
   <title>Controle de qualidade</title>
   <script>
     (function () {
       try {
-        if (localStorage.getItem("hq-theme") === "light") {
+        if (localStorage.getItem("hq-theme") !== "dark") {
           document.documentElement.setAttribute("data-theme", "light");
         }
       } catch (error) {}
@@ -313,6 +314,80 @@
       .actions { grid-template-columns: 1fr; }
       .button-card { min-height: 170px; }
     }
+
+
+    /* =====================================================================
+       VISUAL RUMO COMPACTO / ZOOM OUT — HUB DE QUALIDADE
+       Mantém a identidade dos outros painéis e reduz a escala para caber
+       mais atalhos e informações na mesma tela.
+       ===================================================================== */
+    html { font-size: 14px; }
+    body {
+      padding: 18px;
+      background:
+        radial-gradient(circle at 8% 5%, rgba(0,169,224,.18), transparent 28%),
+        radial-gradient(circle at 88% 2%, rgba(0,214,107,.13), transparent 27%),
+        linear-gradient(160deg, #002E53, #003B67 48%, #004F77);
+    }
+    .home {
+      width: min(1180px, 100%);
+      border-radius: 26px;
+      padding: clamp(22px, 3.1vw, 36px);
+      box-shadow: 0 16px 44px rgba(0, 15, 30, .32);
+    }
+    .home::before { opacity: .10; }
+    .home::after { width: 280px; height: 280px; right: -95px; top: -110px; }
+    .content { gap: 22px; }
+    .brand-badge { padding: 9px 15px; border-radius: 18px; }
+    .brand-badge img { width: clamp(118px, 13vw, 165px); }
+    .eyebrow { font-size: 10px; margin-bottom: 8px; letter-spacing: .22em; }
+    h1 { font-size: clamp(30px, 4.5vw, 52px); line-height: 1; }
+    .subtitle { margin-top: 10px; max-width: 460px; font-size: clamp(13px, 1.4vw, 16px); line-height: 1.45; }
+    .actions {
+      width: 100%;
+      grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+      gap: 13px;
+      align-items: stretch;
+    }
+    .button-card {
+      min-height: 132px;
+      gap: 12px;
+      padding: 17px;
+      border-radius: 20px;
+      align-items: flex-start;
+      text-align: left;
+      box-shadow: 0 12px 30px rgba(0,0,0,.15);
+    }
+    .button-card:hover,
+    .button-card:focus-visible { transform: translateY(-2px); }
+    .button-card strong { font-size: clamp(17px, 1.7vw, 22px); letter-spacing: -.02em; }
+    .button-card p { margin-top: 7px; font-size: 12.5px; line-height: 1.4; }
+    .button-card .go { padding: 8px 12px; font-size: 12px; align-self: flex-start; }
+    footer { font-size: 12px; }
+    .theme-toggle { top: 12px; right: 12px; min-height: 35px; padding: 7px 12px; font-size: 12px; }
+    html[data-theme="light"] body {
+      background:
+        radial-gradient(circle at 6% 2%, rgba(0,169,224,.13), transparent 30%),
+        radial-gradient(circle at 92% 4%, rgba(0,214,107,.16), transparent 30%),
+        repeating-linear-gradient(112deg, transparent 0 64px, rgba(0,59,103,.035) 65px 67px, transparent 68px 120px),
+        linear-gradient(160deg, #ffffff 0%, #f5fbff 54%, #eaf8f0 100%);
+    }
+    html[data-theme="light"] .home {
+      background: linear-gradient(135deg, rgba(255,255,255,.93), rgba(246,251,255,.96));
+      backdrop-filter: blur(16px);
+    }
+    html[data-theme="light"] .button-card { background: rgba(255,255,255,.84); }
+    @media (min-width: 980px) {
+      .actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 760px) {
+      body { padding: 10px; }
+      .home { border-radius: 22px; padding: 20px; }
+      .content { gap: 18px; }
+      .actions { grid-template-columns: 1fr; }
+      .button-card { min-height: 118px; }
+    }
+
   </style>
 </head>
 <body>
@@ -320,7 +395,7 @@
   <main class="home" aria-label="Página inicial do controle de qualidade">
     <div class="content">
       <div class="topbar">
-        <div class="brand-badge" aria-label="Rumo"><img src="https://logospng.org/download/rumo-logistica/logo-rumo-logistica-1024.png" alt="Rumo Logística" /></div>
+        <div class="brand-badge" aria-label="Rumo"><img src="assets/brand/rumo-logo-positivo.png" alt="Rumo Logística" /></div>
       </div>
 
       <section class="intro">
@@ -329,7 +404,7 @@
       </section>
 
       <nav class="actions" aria-label="Escolha do painel">
-        <a class="button-card" href="https://erwinklein94.github.io/Sistema-Qualidade-Completo-Concreto/">
+        <a class="button-card" href="dm-concreto/">
           <span>
             <strong>DM de Concreto</strong>
             <p>Acesse o controle de produção, séries de liberação, refugos e reprovas.</p>
@@ -337,7 +412,7 @@
           <span class="go">Abrir painel →</span>
         </a>
 
-        <a class="button-card" href="https://erwinklein94.github.io/Sistema-Qualidade-Completo-Subcomponentes/">
+        <a class="button-card" href="subcomponentes/">
           <span>
             <strong>Subcomponentes</strong>
             <p>Acesse o controle visual de estoque, inspeções realizadas e cards por subcomponente.</p>

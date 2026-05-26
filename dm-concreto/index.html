@@ -5,26 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Controle de Qualidade de DM de Concreto</title>
   <meta name="description" content="Dashboard para controle de qualidade de dormentes de concreto com importação de planilha, produção, séries de liberação e refugos/reprovas." />
+  <link rel="icon" type="image/png" href="../assets/brand/favicon-rumo.png" />
 
   <script>
     (function () {
       try {
-        if (localStorage.getItem("hq-theme") === "light") {
+        if (localStorage.getItem("hq-theme") !== "dark") {
           document.documentElement.setAttribute("data-theme", "light");
         }
       } catch (error) {}
     })();
   </script>
-  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=rumo-zoomout-20260526" />
 </head>
 <body>
   <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Tema claro</button>
   <main class="page">
     <header class="hero" aria-label="Cabeçalho do painel">
-      <a class="back-link" href="../">← Voltar para a página principal</a>
+      <a class="back-link" href="../">← Hub de Qualidade</a>
       <div class="hero__main">
         <div class="brand" aria-label="Rumo">
-          <img class="brand__logo" src="https://logospng.org/download/rumo-logistica/logo-rumo-logistica-1024.png" alt="Rumo Logística" />
+          <img class="brand__logo" src="../assets/brand/rumo-logo-positivo.png" alt="Rumo Logística" />
           <div class="brand__line"></div>
         </div>
         <div>
@@ -256,7 +257,7 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="assets/js/app.js"></script>
+  <script src="assets/js/app.js?v=rumo-zoomout-20260526"></script>
 
   <script>
     (function () {

@@ -349,7 +349,7 @@ function header() {
     <a class="back-link" href="../">← Voltar para a página principal</a>
     <div class="hero-top">
       <div class="brand-lockup">
-        <div class="logo" aria-label="Rumo"><img class="logo__img" src="https://logospng.org/download/rumo-logistica/logo-rumo-logistica-1024.png" alt="Rumo Logística" /></div>
+        <div class="logo" aria-label="Rumo"><img class="logo__img" src="../assets/brand/rumo-logo-positivo.png" alt="Rumo Logística" /></div>
         <div class="brand-copy">
           <p class="eyebrow">Subcomponentes</p>
           <h1>Controle visual de estoque e inspeções</h1>

@@ -5,19 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Dashboard Rumo para controle visual de estoque e inspeções realizadas." />
   <title>Controle Visual Rumo | Subcomponentes</title>
+  <link rel="icon" type="image/png" href="../assets/brand/favicon-rumo.png" />
 
   <script>
     (function () {
       try {
-        if (localStorage.getItem("hq-theme") === "light") {
+        if (localStorage.getItem("hq-theme") !== "dark") {
           document.documentElement.setAttribute("data-theme", "light");
         }
       } catch (error) {}
     })();
   </script>
-  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <link rel="stylesheet" href="./assets/css/styles.css?v=rumo-zoomout-20260526" />
   <script async id="xlsx-cdn" src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" onload="window.dispatchEvent(new Event('xlsx-ready'))"></script>
-  <script defer src="./assets/js/app.js"></script>
+  <script defer src="./assets/js/app.js?v=rumo-zoomout-20260526"></script>
 </head>
 <body>
   <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Tema claro</button>
