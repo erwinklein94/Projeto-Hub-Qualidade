@@ -146,6 +146,8 @@
     }
 
     .actions {
+      position: relative;
+      z-index: 1;
       display: grid;
       grid-template-columns: 1fr;
       gap: 18px;
@@ -206,6 +208,45 @@
       background: var(--yellow);
       color: var(--navy-2);
       font-weight: 950;
+    }
+
+
+    .actions-panel {
+      position: relative;
+      width: 100%;
+      margin: 0 auto;
+      padding: 18px;
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 18px 36px rgba(0,0,0,.12);
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .actions-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("assets/brand/rumo-locomotiva-watermark.webp");
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+      transform: scale(1.08);
+      transform-origin: center;
+      opacity: .14;
+      filter: saturate(1.05) contrast(1.02);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .actions-panel::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0,46,83,.82), rgba(0,59,103,.58) 42%, rgba(0,169,224,.22));
+      pointer-events: none;
+      z-index: 0;
     }
 
     footer {
@@ -293,6 +334,21 @@
     html[data-theme="light"] .button-card:focus-visible {
       border-color: rgba(0,214,107,.46);
       background: #ffffff;
+    }
+
+
+    html[data-theme="light"] .actions-panel {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(0,59,103,.14);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.65), 0 16px 34px rgba(0,59,103,.08);
+    }
+
+    html[data-theme="light"] .actions-panel::before {
+      opacity: .13;
+    }
+
+    html[data-theme="light"] .actions-panel::after {
+      background: linear-gradient(135deg, rgba(255,255,255,.84), rgba(245,250,255,.76) 40%, rgba(113,232,169,.16));
     }
 
     html[data-theme="light"] .button-card .go {
@@ -386,6 +442,7 @@
       body { padding: 10px; }
       .home { border-radius: 22px; padding: 20px; }
       .content { gap: 18px; }
+      .actions-panel { padding: 12px; border-radius: 18px; }
       .actions { grid-template-columns: 1fr; }
       .button-card { min-height: 118px; }
     }
@@ -405,6 +462,7 @@
         <p class="subtitle">Escolha qual painel deseja acessar.</p>
       </section>
 
+      <section class="actions-panel" aria-label="Área dos atalhos principais">
       <nav class="actions" aria-label="Escolha do painel">
         <a class="button-card" href="https://erwinklein94.github.io/Sistema-Qualidade-Completo-Concreto/" target="_blank" rel="noopener noreferrer">
           <span>
@@ -445,15 +503,8 @@
           </span>
           <span class="go">Abrir leitor →</span>
         </a>
-
-        <a class="button-card" href="http://www.guiadoinspetorpadrao.com.br/" target="_blank" rel="noopener noreferrer">
-          <span>
-            <strong>Flash-cards</strong>
-            <p>Acesse os flash-cards e materiais de apoio pelo Guia do Inspetor Padrão.</p>
-          </span>
-          <span class="go">Abrir guia →</span>
-        </a>
       </nav>
+      </section>
 
       <footer>Controle de qualidade • Coordenação Engenharia de Qualidade &amp; Homologação de Materiais de Via .</footer>
     </div>
