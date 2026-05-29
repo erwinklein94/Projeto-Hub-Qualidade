@@ -346,7 +346,6 @@ function header() {
   const baseLoaded = state.data.estoque.length > 0 || state.data.executados.length > 0;
   const sourceLabel = baseLoaded ? d.source : 'Nenhuma planilha importada';
   return `<header class="hero hero-clean">
-    <a class="back-link" href="../">← Voltar para a página principal</a>
     <div class="hero-top">
       <div class="brand-lockup">
         <div class="logo" aria-label="Rumo"><img class="logo__img" src="../assets/rumo/logos/rumo-logo-azul.png" alt="Rumo Logística" /></div>
