@@ -447,6 +447,147 @@
       .button-card { min-height: 118px; }
     }
 
+
+    /* =====================================================================
+       IDENTIDADE VISUAL RUMO — brandbook oficial aplicado em 2026-05-29
+       Tokens centralizados: azul #003865 dominante, acentos institucionais,
+       Cera Pro com fallback Verdana e grafismos sutis com chanfro.
+       ===================================================================== */
+    :root {
+      --rumo-azul: #003865;
+      --rumo-azul-claro: #32A6E6;
+      --rumo-verde: #1E9F7F;
+      --rumo-verde-claro: #7FE06C;
+      --rumo-azul-profundo: #002B4D;
+      --rumo-azul-noite: #001E36;
+      --rumo-amarelo: #FBD300;
+      --rumo-laranja: #F78344;
+      --rumo-cinza: #BDCCD4;
+      --rumo-cinza-50: #F2F5F6;
+      --rumo-cinza-100: #E5EBEE;
+      --rumo-cinza-200: #D7E0E5;
+      --rumo-cinza-300: #CAD6DD;
+      --rumo-texto: #4D626F;
+      --rumo-texto-claro: #6F838E;
+      --rumo-fonte: "Cera Pro", Verdana, Geneva, Tahoma, sans-serif;
+      --rumo-raio: 14px;
+      --rumo-raio-lg: 22px;
+      --rumo-sombra: 0 4px 18px rgba(0, 56, 101, 0.08);
+      --rumo-sombra-hover: 0 10px 30px rgba(0, 56, 101, 0.16);
+
+      --navy: var(--rumo-azul);
+      --navy-2: var(--rumo-azul-profundo);
+      --blue: var(--rumo-azul-claro);
+      --green: var(--rumo-verde);
+      --yellow: var(--rumo-amarelo);
+      --white: #FFFFFF;
+      --line: rgba(255,255,255,.16);
+      --muted: rgba(255,255,255,.76);
+      --shadow: var(--rumo-sombra-hover);
+    }
+
+    html[data-theme="light"] {
+      --navy: var(--rumo-azul);
+      --navy-2: var(--rumo-azul-profundo);
+      --blue: var(--rumo-azul-claro);
+      --green: var(--rumo-verde);
+      --yellow: var(--rumo-amarelo);
+      --white: var(--rumo-azul);
+      --line: rgba(0,56,101,.16);
+      --muted: rgba(77,98,111,.78);
+      --shadow: var(--rumo-sombra);
+    }
+
+    body {
+      font-family: var(--rumo-fonte);
+      background:
+        radial-gradient(circle at 8% 5%, rgba(50,166,230,.20), transparent 28%),
+        radial-gradient(circle at 88% 2%, rgba(30,159,127,.15), transparent 27%),
+        linear-gradient(160deg, var(--rumo-azul-profundo), var(--rumo-azul) 52%, #00558D);
+    }
+
+    .home {
+      border-radius: var(--rumo-raio-lg);
+      border-color: rgba(255,255,255,.16);
+      background: linear-gradient(135deg, rgba(0,56,101,.96), rgba(0,43,77,.98));
+    }
+
+    .home::before {
+      background:
+        linear-gradient(115deg, rgba(50,166,230,.14), transparent 42%),
+        repeating-linear-gradient(112deg, transparent 0 54px, rgba(255,255,255,.09) 55px 57px, transparent 58px 106px);
+    }
+
+    .brand-badge {
+      border-radius: var(--rumo-raio);
+      border-color: rgba(0,56,101,.16);
+      box-shadow: var(--rumo-sombra);
+    }
+
+    .eyebrow { color: var(--rumo-verde-claro); }
+
+    .button-card {
+      position: relative;
+      border-radius: var(--rumo-raio);
+      border-color: rgba(255,255,255,.16);
+      box-shadow: 0 14px 34px rgba(0,30,54,.22);
+      overflow: hidden;
+    }
+
+    .button-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--rumo-azul-claro), var(--rumo-verde), var(--rumo-verde-claro));
+    }
+
+    .button-card:hover,
+    .button-card:focus-visible {
+      border-color: rgba(127,224,108,.55);
+      box-shadow: var(--rumo-sombra-hover);
+    }
+
+    .button-card .go {
+      background: var(--rumo-amarelo);
+      color: var(--rumo-azul-profundo);
+    }
+
+    .actions-panel {
+      border-radius: var(--rumo-raio-lg);
+      border-color: rgba(255,255,255,.16);
+    }
+
+    .theme-toggle {
+      font-family: var(--rumo-fonte);
+      border-radius: 999px;
+    }
+
+    html[data-theme="light"] body {
+      color: var(--rumo-azul-profundo);
+      background:
+        radial-gradient(circle at 6% 2%, rgba(50,166,230,.12), transparent 30%),
+        radial-gradient(circle at 92% 4%, rgba(30,159,127,.14), transparent 30%),
+        repeating-linear-gradient(112deg, transparent 0 64px, rgba(0,56,101,.035) 65px 67px, transparent 68px 120px),
+        linear-gradient(160deg, #FFFFFF 0%, var(--rumo-cinza-50) 56%, #EAF8F0 100%);
+    }
+
+    html[data-theme="light"] .home {
+      background: linear-gradient(135deg, rgba(255,255,255,.94), rgba(242,245,246,.98));
+      border-color: rgba(0,56,101,.16);
+    }
+
+    html[data-theme="light"] .actions-panel::after {
+      background: linear-gradient(135deg, rgba(255,255,255,.86), rgba(242,245,246,.78) 40%, rgba(127,224,108,.14));
+    }
+
+    html[data-theme="light"] .button-card:hover,
+    html[data-theme="light"] .button-card:focus-visible {
+      border-color: rgba(30,159,127,.44);
+    }
+
   </style>
 </head>
 <body>
@@ -454,7 +595,7 @@
   <main class="home" aria-label="Página inicial do controle de qualidade">
     <div class="content">
       <div class="topbar">
-        <div class="brand-badge" aria-label="Rumo"><img src="assets/brand/rumo-logo-positivo.png" alt="Rumo Logística" /></div>
+        <div class="brand-badge" aria-label="Rumo"><img src="assets/rumo/logos/rumo-logo-azul.png" alt="Rumo Logística" /></div>
       </div>
 
       <section class="intro">
@@ -464,7 +605,7 @@
 
       <section class="actions-panel" aria-label="Área dos atalhos principais">
       <nav class="actions" aria-label="Escolha do painel">
-        <a class="button-card" href="https://erwinklein94.github.io/Sistema-Qualidade-Completo-Concreto/" target="_blank" rel="noopener noreferrer">
+        <a class="button-card" href="dm-concreto/">
           <span>
             <strong>DM de Concreto</strong>
             <p>Acesse o controle de produção, séries de liberação, refugos e reprovas.</p>
@@ -472,7 +613,7 @@
           <span class="go">Abrir painel →</span>
         </a>
 
-        <a class="button-card" href="https://erwinklein94.github.io/Sistema-Qualidade-Completo-Subcomponentes/" target="_blank" rel="noopener noreferrer">
+        <a class="button-card" href="subcomponentes/">
           <span>
             <strong>Subcomponentes</strong>
             <p>Acesse o controle visual de estoque, inspeções realizadas e cards por subcomponente.</p>

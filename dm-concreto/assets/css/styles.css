@@ -1290,3 +1290,254 @@ td { padding: 8px 9px; }
   .kpi-grid, .mini-stats { grid-template-columns: 1fr; }
   table { min-width: 780px; }
 }
+
+
+/* =====================================================================
+   IDENTIDADE VISUAL RUMO — brandbook oficial aplicado em 2026-05-29
+   Tokens centralizados: azul #003865 dominante, acentos institucionais,
+   Cera Pro com fallback Verdana e grafismos sutis com chanfro.
+   ===================================================================== */
+:root {
+  --rumo-azul: #003865;
+  --rumo-azul-claro: #32A6E6;
+  --rumo-verde: #1E9F7F;
+  --rumo-verde-claro: #7FE06C;
+  --rumo-azul-profundo: #002B4D;
+  --rumo-azul-noite: #001E36;
+  --rumo-amarelo: #FBD300;
+  --rumo-laranja: #F78344;
+  --rumo-cinza: #BDCCD4;
+  --rumo-cinza-50: #F2F5F6;
+  --rumo-cinza-100: #E5EBEE;
+  --rumo-cinza-200: #D7E0E5;
+  --rumo-cinza-300: #CAD6DD;
+  --rumo-texto: #4D626F;
+  --rumo-texto-claro: #6F838E;
+  --rumo-fonte: "Cera Pro", Verdana, Geneva, Tahoma, sans-serif;
+  --rumo-raio: 14px;
+  --rumo-raio-lg: 22px;
+  --rumo-sombra: 0 4px 18px rgba(0, 56, 101, 0.08);
+  --rumo-sombra-hover: 0 10px 30px rgba(0, 56, 101, 0.16);
+
+  --navy: var(--rumo-azul);
+  --navy-2: var(--rumo-azul-profundo);
+  --navy-3: #004F77;
+  --blue: var(--rumo-azul-claro);
+  --green: var(--rumo-verde);
+  --green-2: var(--rumo-verde);
+  --green-soft: rgba(127, 224, 108, .22);
+  --yellow: var(--rumo-amarelo);
+  --orange: var(--rumo-laranja);
+  --white: #FFFFFF;
+  --ice: var(--rumo-cinza-50);
+  --slate: var(--rumo-cinza);
+  --line: rgba(255,255,255,.15);
+  --line-dark: var(--rumo-cinza-200);
+  --muted: rgba(255,255,255,.74);
+  --muted2: rgba(255,255,255,.52);
+  --text: #FFFFFF;
+  --ink: var(--rumo-azul);
+  --danger: #D84545;
+  --radius: var(--rumo-raio-lg);
+  --shadow: 0 13px 36px rgba(0, 30, 54, .22);
+}
+
+html[data-theme="light"] {
+  --navy: var(--rumo-azul);
+  --navy-2: var(--rumo-azul-profundo);
+  --navy-3: #004F77;
+  --blue: var(--rumo-azul-claro);
+  --green: var(--rumo-verde);
+  --green-2: var(--rumo-verde);
+  --green-soft: rgba(127, 224, 108, .18);
+  --yellow: var(--rumo-amarelo);
+  --orange: var(--rumo-laranja);
+  --white: var(--rumo-azul);
+  --ice: var(--rumo-cinza-50);
+  --slate: var(--rumo-texto);
+  --line: rgba(0,56,101,.16);
+  --line-dark: var(--rumo-cinza-200);
+  --muted: rgba(77,98,111,.78);
+  --muted2: rgba(77,98,111,.56);
+  --text: var(--rumo-azul-profundo);
+  --ink: var(--rumo-azul);
+  --shadow: var(--rumo-sombra);
+}
+
+body,
+button,
+input,
+select {
+  font-family: var(--rumo-fonte);
+}
+
+body {
+  background:
+    radial-gradient(circle at 12% 4%, rgba(30,159,127,.16), transparent 23rem),
+    radial-gradient(circle at 86% 10%, rgba(50,166,230,.18), transparent 24rem),
+    linear-gradient(180deg, var(--rumo-azul-profundo) 0%, var(--rumo-azul) 100%);
+}
+
+.back-link,
+.theme-toggle,
+.btn,
+.primary,
+.secondary,
+.tab-button,
+.tab-btn,
+.pill,
+.status-badge {
+  font-family: var(--rumo-fonte);
+}
+
+.hero,
+.import-card,
+.filter-card,
+.panel,
+.kpi,
+.card,
+.series-card,
+.source-pill,
+.base-badge,
+.tile,
+.drop-zone,
+.drop,
+.insight,
+.rule-step,
+.weekly-report__auto-card {
+  border-radius: var(--rumo-raio-lg);
+  border-color: rgba(255,255,255,.15);
+  box-shadow: var(--shadow);
+}
+
+.hero,
+html[data-theme="light"] .hero {
+  background: linear-gradient(115deg, rgba(255,255,255,.99) 0%, rgba(255,255,255,.99) 66%, rgba(242,245,246,.98) 84%, rgba(229,246,224,.96) 100%);
+  color: var(--rumo-azul-profundo);
+  border-color: rgba(0,56,101,.16);
+}
+
+.hero::before,
+.hero:before {
+  background:
+    radial-gradient(circle at 86% 16%, rgba(0,56,101,.10), transparent 18rem),
+    linear-gradient(90deg, transparent 0%, transparent 76%, rgba(127,224,108,.12) 100%);
+}
+
+.hero::after,
+.hero:after,
+.kpi::after,
+.kpi:after,
+.card:after {
+  background: rgba(30,159,127,.16);
+}
+
+.eyebrow { color: var(--rumo-verde); }
+.tile.yellow,
+.mini.yellow,
+.tab-button.active,
+.tab-btn.active {
+  background: var(--rumo-amarelo);
+  border-color: var(--rumo-amarelo);
+  color: var(--rumo-azul-profundo);
+}
+
+.btn--primary,
+.primary,
+.production-week-shortcut {
+  background: var(--rumo-azul);
+  border-color: var(--rumo-azul);
+  color: #FFFFFF;
+}
+
+.btn--primary:hover,
+.primary:hover,
+.production-week-shortcut:hover {
+  background: var(--rumo-azul-profundo);
+  border-color: var(--rumo-azul-profundo);
+}
+
+.btn--ghost,
+.secondary,
+.back-link,
+html[data-theme="light"] .secondary,
+html[data-theme="light"] .back-link,
+html[data-theme="light"] .theme-toggle {
+  background: var(--rumo-azul-profundo);
+  border-color: rgba(0,56,101,.28);
+  color: #FFFFFF;
+}
+
+.tab-button.active,
+.tab-btn.active {
+  box-shadow: 0 8px 20px rgba(251,211,0,.18);
+}
+
+.progress-fill,
+.bar-fill,
+.dual-fill.stock {
+  background: linear-gradient(90deg, var(--rumo-azul-claro), var(--rumo-verde));
+}
+
+.dual-fill.insp {
+  background: linear-gradient(90deg, var(--rumo-amarelo), var(--rumo-verde-claro));
+}
+
+html[data-theme="light"] body {
+  color: var(--rumo-azul-profundo);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(30,159,127,.16), transparent 30%),
+    radial-gradient(circle at 82% 5%, rgba(50,166,230,.10), transparent 28%),
+    linear-gradient(160deg,#FFFFFF 0%, var(--rumo-cinza-50) 54%, #EAF8F0 100%);
+}
+
+html[data-theme="light"] .import-card,
+html[data-theme="light"] .filter-card,
+html[data-theme="light"] .panel,
+html[data-theme="light"] .kpi,
+html[data-theme="light"] .card,
+html[data-theme="light"] .tile,
+html[data-theme="light"] .base-badge,
+html[data-theme="light"] .drop-zone,
+html[data-theme="light"] .drop,
+html[data-theme="light"] .source-pill,
+html[data-theme="light"] .series-card,
+html[data-theme="light"] .insight,
+html[data-theme="light"] .rule-step,
+html[data-theme="light"] .weekly-report__auto-card {
+  background: rgba(255,255,255,.91);
+  border-color: rgba(0,56,101,.14);
+  color: var(--rumo-azul-profundo);
+}
+
+/* Chanfro sutil inspirado nos grafismos da marca, sem distorcer componentes. */
+.panel,
+.panel-head,
+.filter-card,
+.import-card,
+.kpi,
+.card,
+.series-card,
+.tile,
+.base-badge,
+.source-pill {
+  position: relative;
+}
+
+.import-card::before,
+.filter-card::before,
+.panel::before,
+.kpi::before,
+.card::before,
+.series-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: min(150px, 38%);
+  height: 4px;
+  background: linear-gradient(90deg, var(--rumo-azul-claro), var(--rumo-verde), var(--rumo-verde-claro));
+  border-radius: var(--rumo-raio-lg) var(--rumo-raio-lg) 0 0;
+  opacity: .86;
+  pointer-events: none;
+}

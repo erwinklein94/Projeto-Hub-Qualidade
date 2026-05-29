@@ -9,16 +9,16 @@
 'use strict';
 
 const THEME = {
-  navy: '#003B67',
-  navy2: '#002E53',
-  blue: '#00A9E0',
-  green: '#00D66B',
-  yellow: '#FFDD00',
+  navy: '#003865',
+  navy2: '#002B4D',
+  blue: '#32A6E6',
+  green: '#1E9F7F',
+  yellow: '#FBD300',
   white: '#FFFFFF',
-  orange: '#FF8B3D'
+  orange: '#F78344'
 };
 
-const COLORS = [THEME.blue, THEME.green, THEME.yellow, '#AEEA00', '#80D8FF', '#F9FAFB', THEME.orange];
+const COLORS = [THEME.blue, THEME.green, THEME.yellow, '#7FE06C', '#BDCCD4', '#F9FAFB', THEME.orange];
 const TABS = [
   ['importar', '⬆', 'Importar planilha'],
   ['geral', '⇄', 'Dashboard geral'],
@@ -349,7 +349,7 @@ function header() {
     <a class="back-link" href="../">← Voltar para a página principal</a>
     <div class="hero-top">
       <div class="brand-lockup">
-        <div class="logo" aria-label="Rumo"><img class="logo__img" src="../assets/brand/rumo-logo-positivo.png" alt="Rumo Logística" /></div>
+        <div class="logo" aria-label="Rumo"><img class="logo__img" src="../assets/rumo/logos/rumo-logo-azul.png" alt="Rumo Logística" /></div>
         <div class="brand-copy">
           <p class="eyebrow">Subcomponentes</p>
           <h1>Controle visual de estoque e inspeções</h1>

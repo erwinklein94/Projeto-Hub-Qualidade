@@ -1097,9 +1097,9 @@ function exportWeeklyReportPdf() {
     return;
   }
   win.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Produção semanal</title><style>
-    body{font-family:Arial,sans-serif;margin:32px;color:#111827;}
+    body{font-family:"Cera Pro", Verdana, Geneva, Tahoma, sans-serif;margin:32px;color:#003865;}
     h1{font-size:22px;margin:0 0 18px;}
-    pre{white-space:pre-wrap;font-family:Arial,sans-serif;font-size:14px;line-height:1.5;border:1px solid #d1d5db;border-radius:14px;padding:20px;}
+    pre{white-space:pre-wrap;font-family:"Cera Pro", Verdana, Geneva, Tahoma, sans-serif;font-size:14px;line-height:1.5;border:1px solid #D7E0E5;border-radius:14px;padding:20px;}
     @media print{body{margin:18mm;} pre{border:0;padding:0;}}
   </style></head><body><h1>Anotação semanal de produção</h1><pre>${escapePreserveHtml(text)}</pre><script>window.addEventListener('load',function(){setTimeout(function(){window.print();},250);});<\/script></body></html>`);
   win.document.close();
